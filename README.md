@@ -1,6 +1,6 @@
 # Node.js ParcelLab API
 
-This is a simple (unofficial) wrapper to interface the parcelLab API to [Node.js](https://nodejs.org/), based on [this project](https://bitbucket.org/parcellab/sdk-node) but rewritten in Typescript.
+This is a simple unofficial wrapper to interface the parcelLab API to [Node.js](https://nodejs.org/), based on [this project](https://bitbucket.org/parcellab/sdk-node) but rewritten in Typescript.
 
 ## Background
 
