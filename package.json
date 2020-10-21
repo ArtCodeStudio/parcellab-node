@@ -1,7 +1,7 @@
 {
   "name": "parcellab",
   "version": "0.0.1",
-  "description": "SDK for the parcelLab API for Node.js written in Typescript",
+  "description": "Unofficial SDK for the parcelLab API for Node.js written in Typescript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -32,7 +32,6 @@
   "files": [
     "src/",
     "dist/"
-
   ],
   "dependencies": {
     "got": "^11.8.0",

@@ -1,6 +1,6 @@
 # Node.js ParcelLab API
 
-This is a simple wrapper to interface the parcelLab API for [Node.js](https://nodejs.org/) and inspired on [this project](https://bitbucket.org/parcellab/sdk-node) but rewritten in Typescript.
+This is a simple (unofficial) wrapper to interface the parcelLab API to [Node.js](https://nodejs.org/), based on [this project](https://bitbucket.org/parcellab/sdk-node) but rewritten in Typescript.
 
 ## Background
 
@@ -24,11 +24,11 @@ git clone https://github.com/ArtCodeStudio/parcellab-node.git
 
 ## Usage
 
-You can find examples in examples/:
+You can find an Javascript and Typescript example in [examples](https://github.com/ArtCodeStudio/parcellab-node/tree/main/examples):
 
 ```javascript
 const { ParcelLabApi } = require('parcellab');
-const ParcelLabApi = new ParcelLabApi(1, 'ParcelLabApitoken-30characters');
+const parcellab = new ParcelLabApi(1, 'ParcelLabApitoken-30characters');
 
 const payloadTracking = {
   courier: 'dhl-germany',
@@ -38,18 +38,22 @@ const payloadTracking = {
   articles: []
 };
 
-const result = await ParcelLabApi.createOrUpdateTracking(payloadTracking);
-console.log(result);
+try {
+  const result = await parcellab.createOrUpdateTracking(payloadTracking);
+  console.log(result);
+} catch (error) {
+  console.error("Error on transfer tracking", error);
+}
+
 ```
 
-
-For required and optional properies see the interfaces.
+For required and optional properies see the [interfaces](https://github.com/ArtCodeStudio/parcellab-node/tree/main/src/interfaces).
 
 ## Dealing with multiple tracking numbers
 
 The module features dealing with multiple tracking numbers embedded in the payload. This allows to use one single call of `createOrUpdateTracking(payload)` for creating multiple trackings for a single order, e.g. when an order from a customer is shipped in several deliveries.
 
-### 1.) Multiple deliveries with same courier
+### Multiple deliveries with same courier
 
 If all shipments are done with a single courier, multiple tracking numbers can simply listed with either the delimiter `,` or `|` within the attribute `tracking_number` like so:
 
@@ -60,7 +64,7 @@ var payload = {
 };
 ```
 
-### 2.) Multiple deliveries with multiple couriers
+### Multiple deliveries with multiple couriers
 
 In the more complex case where the deliveries are not performed by the same courier, the tracking numbers can be embedded via `JSON` by using the name of the courier as the key and the associated tracking numbers in an array. Example:
 
@@ -73,6 +77,10 @@ var payload = {
   }
 };
 ```
+
+## Connect your Store with parcelLab
+
+If you own a Shopify store we already have a ready to use connection for you, just contact us at [hi@artandcode.studio](mailto:hi@artandcode.studio?subject=ParcelLab Shopify Integration request).
 
 ## License (ISC)  
 
