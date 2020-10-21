@@ -80,7 +80,7 @@ var payload = {
 
 ## Connect your Store with parcelLab
 
-If you own a Shopify store we already have a ready to use connection for you, just contact us at [hi@artandcode.studio](mailto:hi@artandcode.studio?subject=ParcelLab Shopify Integration request).
+If you own a Shopify store we already have a ready to use connection for you, just contact us at hi@artandcode.studio.
 
 ## License (ISC)  
 
