@@ -2,7 +2,7 @@
  * Based on https://bitbucket.org/parcellab/sdk-node/src/master/params.json
  */
 
-export const params = {
+const params = {
   endpoint: "https://api.parcellab.com/",
   mockEndpoint: "https://mock-api.parcellab.com/",
   tracking: {
@@ -200,3 +200,5 @@ export const params = {
     "post",
   ]
 }
+
+export default params;

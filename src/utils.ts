@@ -40,7 +40,7 @@ export const objHasOnlyKeys = (obj: any, arrayOfKeys: string[]) => {
 
   const objKeys = keys(obj);
   for (let i = 0; i < objKeys.length; i++) {
-    if (contains(arrayOfKeys, objKeys[i])) {
+    if (!contains(arrayOfKeys, objKeys[i])) {
       allAllowed = false;
       unallowed.push(objKeys[i]);
     }

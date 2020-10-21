@@ -2,7 +2,7 @@ export * from './interfaces'
 export * from './params';
 export * from './utils';
 
-import { params } from './params';
+import params from './params';
 import * as utils from './utils';
 import { ParcellabTracking, ParcellabOrder, ParcellabSearchResponse } from './interfaces'
 
