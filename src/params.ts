@@ -180,7 +180,7 @@ const params = {
     // Transform //
     ///////////////
     "dhl-express": "dhl",
-    "dhlp": "dhl-de",
+    "dhlp": "dhl-germany",
     "hermes-germany": "hermes-de",
     "hermes": "hermes-de",
     "hrms": "hermes-de",
