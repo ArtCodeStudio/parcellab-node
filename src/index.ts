@@ -198,7 +198,7 @@ export class ParcelLabApi {
    *                          {ups:["1Z74845R6842887612","1Z74845R6842758029"]}
    * @return Array of payloads with single tracking numbers
    */
-  protected multiplyOnTrackingNumber(payload: ParcellabOrder | ParcellabTracking): any[] {
+  protected multiplyOnTrackingNumber(payload: ParcellabOrder | ParcellabTracking): (ParcellabOrder | ParcellabTracking)[] {
     const tnos = [];
     const payloads = []; // array of new payloads
     const terminator = this.hasMultipleTrackingNumbers(payload);
@@ -245,7 +245,7 @@ export class ParcelLabApi {
     }
 
     for (let i = 0; i < tnos.length; i++) {
-      const newPayload = extend({}, payload);
+      const newPayload = extend({}, payload) as ParcellabOrder | ParcellabTracking;
       newPayload.courier = this.guessCourier(tnos[i].courier, payload.destination_country_iso3);
       newPayload.tracking_number = tnos[i].tracking_number;
       payloads.push(newPayload);
@@ -254,8 +254,11 @@ export class ParcelLabApi {
     return payloads;
   }
 
-  protected handleCourierName(courier: string) {
-    return courier.trim().toLowerCase().replace(/\s/g,"-");
+  protected handleCourierName(courier?: string) {
+    if (courier) {
+      return courier.trim().toLowerCase().replace(/\s/g,"-");
+    }
+    return courier;
   }
   
   /**
@@ -264,8 +267,11 @@ export class ParcelLabApi {
    * @param destinationCountryIso3
    * @return Mapping to actual courier code
    */
-  protected guessCourier(input: string, destinationCountryIso3?: string): string {
-    let output = this.handleCourierName(input);
+  protected guessCourier(input?: string, destinationCountryIso3?: string): string | undefined {
+    if (!input) {
+      return input;
+    }
+    let output: string | undefined = this.handleCourierName(input);
 
     if (params.couriersAppendCountry.includes(output) && destinationCountryIso3) {
       destinationCountryIso3 = destinationCountryIso3.toLowerCase();
