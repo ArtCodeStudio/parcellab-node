@@ -133,6 +133,12 @@ const params = {
     "dhl-de": "dhl-germany",
     "dhl-deu": "dhl-germany",
 
+    // TODO checkme
+    "dhl-at": "dhl-germany",
+    "dhl-aut": "dhl-germany",
+    // "dhl-at": "dhl-austria",
+    // "dhl-aut": "dhl-austria",
+
     "dhl-pl": "dhl-poland",
     "dhl-pol": "dhl-poland",
 
@@ -181,6 +187,7 @@ const params = {
     ///////////////
     "dhl-express": "dhl",
     "dhlp": "dhl-germany",
+    "dpdhl": "dhl-germany", // Deutsche Post DHL
     "hermes-germany": "hermes-de",
     "hermes": "hermes-de",
     "hrms": "hermes-de",
