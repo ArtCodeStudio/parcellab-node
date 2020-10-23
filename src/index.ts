@@ -18,9 +18,8 @@ import { stringify as QueryString } from 'querystring';
  */
 export class ParcelLabApi {
   /**
-   * Constructor of CheckpointAnalyser, needs to be supplied the courier and options if available
-   * @param {Number} user
-   * @param {String} token
+   * @param user
+   * @param token
    */
   constructor(protected user: number, protected token: string) {
       if (!ø.isInt(user.toString()) || token.length < 30) {
@@ -197,16 +196,18 @@ export class ParcelLabApi {
     } else if (terminator === 'array') {
       const tracking_numbers = payload.tracking_number as string[];
       for (const trackingNumber of tracking_numbers) {
+        const courier = this.guessCourier(payload.courier, payload.destination_country_iso3);
         tnos.push({
-          courier: payload.courier,
+          courier,
           tracking_number: trackingNumber,
         });
       }
     } else if (terminator.length == 1) {
       const tnos_raw = (payload.tracking_number as string).split(terminator);
       for (let j = 0; j < tnos_raw.length; j++) {
+        const courier = this.guessCourier(payload.courier, payload.destination_country_iso3);
         tnos.push({
-          courier: payload.courier,
+          courier,
           tracking_number: tnos_raw[j]
         });
       }
@@ -224,6 +225,10 @@ export class ParcelLabApi {
 
     return payloads;
   }
+
+  protected handleCourierName(courier: string) {
+    return courier.trim().toLowerCase().replace(/\s/g,"-");
+  }
   
   /**
    * Retrieves courier code from mappings for given courier name if available
@@ -232,8 +237,8 @@ export class ParcelLabApi {
    * @return Mapping to actual courier code
    */
   protected guessCourier(input: string, destinationCountryIso3?: string): string {
+    input = this.handleCourierName(input);
     let output = input;
-    output = output.trim().toLowerCase().replace(/ /g,"-");
 
     if (params.couriersAppendCountry.includes(output) && destinationCountryIso3) {
       console.warn("Append country code to courier, please check if this is the correct courier you use.")
@@ -243,12 +248,15 @@ export class ParcelLabApi {
 
     try {
       const knownInputs = keys(params.couriers);
-      if (knownInputs.indexOf(input.toLowerCase()) > -1) {
-        output = params.couriers[input.toLowerCase()];
+      if (knownInputs.indexOf(input) > -1) {
+        output = params.couriers[input];
       }
     } catch (e) {
       console.warn('Unknown courier: ' + input);
     }
+
+    output = this.handleCourierName(output);
+
     return output;
   }
   

@@ -98,6 +98,7 @@ const params = {
     "dpd-uk": "dpd-uk",
     "hermes-uk": "hermes-uk",
     "uk-mail": "uk-mail",
+    "whistl": "whistl", // TODO is Whistl currently not supported by parcel lab?
 
     // France
     "chronopost": "chronopost",
@@ -179,12 +180,15 @@ const params = {
     // Transform //
     ///////////////
     "dhl-express": "dhl",
+    "dhlp": "dhl-de",
     "hermes-germany": "hermes-de",
     "hermes": "hermes-de",
+    "hrms": "hermes-de",
     "dpd": "dpd-de",
     "dpd-germany": "dpd-de",
     "colis-privé": "colisprivee",
     "colis-prive": "colisprivee",
+    "colis": "colisprivee",
     "ups-express": "ups",
     "asendia-germany": "asendia",
     "asendia-deutschland": "asendia",
