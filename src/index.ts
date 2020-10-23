@@ -108,45 +108,65 @@ export class ParcelLabApi {
    * Checks whether a payload is valid
    * @param payload Payload to be transmitted to parcelLab API
    */
-  protected checkPayload(payload: ParcellabOrder | ParcellabTracking, endpoint: 'tracking' | 'order'): { error: string | null, isValid?: boolean } {
+  protected checkPayload(payload: ParcellabOrder | ParcellabTracking, endpoint: 'tracking' | 'order'): { error: string | null, isValid?: boolean, invalidKeys: string[] } {
     const requiredKeys = params[endpoint].requiredKeys;
     const allowedKeys = requiredKeys.concat(params.allowedKeys);
-    if (utils.objHasKeys(payload, requiredKeys)) {
-      const keyChecker = utils.objHasOnlyKeys(payload, allowedKeys);
-      if (!keyChecker.allAllowed) {
-        return { error: 'Used not allowed keys: ' + keyChecker.unallowed.join(', '), isValid: false };
-      }
+    let isValid = true;
+    let error = '';
+    let invalidKeys: string[] = [];
 
-      let isValid = true;
-      let error = '';
-      const datachecks = params.datachecks;
-
-      for (let i = 0; i < datachecks.email.length; i++) {
-        if (!isNull(payload[datachecks.email[i]]) && !isUndefined(payload[datachecks.email[i]])) {
-          isValid = isValid && ø.isEmail(payload[datachecks.email[i]]);
-        }
-      }
-      if (!isValid) error = 'Field to be required to be an email is not an email';
-
-      for (let j = 0; j < datachecks.number.length; j++) {
-        if (!isNull(payload[datachecks.number[j]]) && !isUndefined(payload[datachecks.number[j]])) {
-          isValid = isValid && typeof payload[datachecks.number[j]] === 'number';
-        }
-      }
-      if (!isValid) error = 'Field to be required to be a number is not a number';
-
-      for (let k = 0; k < datachecks.boolean.length; k++) {
-        if (!isNull(payload[datachecks.boolean[k]]) && !isUndefined(payload[datachecks.boolean[k]])) {
-          isValid = isValid && (typeof payload[datachecks.boolean[k]] === 'boolean');
-        }
-      }
-      if (!isValid) error = 'Field to be required to be a bool is not a bool';
-
-      return { error, isValid };
-
-    } else {
-      return { error: 'Required keys missing', isValid: false };
+    const keyChecker1 = utils.objHasKeys(payload, requiredKeys);
+    if (!keyChecker1.missing) {
+      invalidKeys = [...invalidKeys, ...keyChecker1.missing];
+      isValid = false;
+      error = 'Required keys missing: ' + keyChecker1.missing.join(', ');
+      return { error, isValid, invalidKeys };
     }
+  
+    const keyChecker2 = utils.objHasOnlyKeys(payload, allowedKeys);
+    if (!keyChecker2.allAllowed) {
+      invalidKeys = [...invalidKeys, ...keyChecker2.unallowed];
+      isValid = false;
+      error = 'Used not allowed keys: ' + keyChecker2.unallowed.join(', ');
+      return { error, isValid, invalidKeys };
+    }
+
+    const datachecks = params.datachecks;
+
+    for (let i = 0; i < datachecks.email.length; i++) {
+      if (!isNull(payload[datachecks.email[i]]) && !isUndefined(payload[datachecks.email[i]])) {
+        const isCurValid = ø.isEmail(payload[datachecks.email[i]]);
+        if (!isCurValid) {
+          invalidKeys.push(datachecks.email[i]);
+          error = 'Field to be required to be an email is not an email';
+        }
+        isValid = isValid && isCurValid;
+      }
+    }
+
+    for (let j = 0; j < datachecks.number.length; j++) {
+      if (!isNull(payload[datachecks.number[j]]) && !isUndefined(payload[datachecks.number[j]])) {
+        const isCurValid = typeof payload[datachecks.number[j]] === 'number';
+        if (!isCurValid) {
+          invalidKeys.push(datachecks.number[j]);
+          error = 'Field to be required to be a number is not a number';
+        }
+        isValid = isValid && isCurValid;
+      }
+    }
+
+    for (let k = 0; k < datachecks.boolean.length; k++) {
+      if (!isNull(payload[datachecks.boolean[k]]) && !isUndefined(payload[datachecks.boolean[k]])) {
+        const isCurValid = (typeof payload[datachecks.boolean[k]] === 'boolean');
+        if (!isCurValid) {
+          invalidKeys.push(datachecks.number[k]);
+          error = 'Field to be required to be a bool is not a bool';
+        }
+        isValid = isValid && isCurValid;
+      }
+    }
+
+    return { error, isValid, invalidKeys };
   }
   
   /**
@@ -176,15 +196,22 @@ export class ParcelLabApi {
    * @return Array of payloads with single tracking numbers
    */
   protected multiplyOnTrackingNumber(payload: ParcellabOrder | ParcellabTracking): any[] {
-    const terminator = this.hasMultipleTrackingNumbers(payload);
-    if (terminator === null) return [payload];
-
     const tnos = [];
-    if (terminator === 'json') {
+    const payloads = []; // array of new payloads
+    const terminator = this.hasMultipleTrackingNumbers(payload);
+
+    if (terminator === null) {
+      const courier = payload.courier;
+      const tracking_number = payload.tracking_number;
+      tnos.push({
+        courier,
+        tracking_number
+      });
+    } else if (terminator === 'json') {
       const json = payload.tracking_number;
       const jsonCouriers = keys(json);
       for (let k = 0; k < jsonCouriers.length; k++) {
-          const courier = this.guessCourier(jsonCouriers[k], payload.destination_country_iso3);
+          const courier = jsonCouriers[k];
           const jsonTnos = json[jsonCouriers[k]];
           for (let l = 0; l < jsonTnos.length; l++) {
               tnos.push({
@@ -195,31 +222,29 @@ export class ParcelLabApi {
       }
     } else if (terminator === 'array') {
       const tracking_numbers = payload.tracking_number as string[];
-      for (const trackingNumber of tracking_numbers) {
-        const courier = this.guessCourier(payload.courier, payload.destination_country_iso3);
+      for (const tracking_number of tracking_numbers) {
+        const courier = payload.courier;
         tnos.push({
           courier,
-          tracking_number: trackingNumber,
+          tracking_number,
         });
       }
     } else if (terminator.length == 1) {
       const tnos_raw = (payload.tracking_number as string).split(terminator);
       for (let j = 0; j < tnos_raw.length; j++) {
-        const courier = this.guessCourier(payload.courier, payload.destination_country_iso3);
+        const courier = payload.courier;
+        const tracking_number = tnos_raw[j];
         tnos.push({
           courier,
-          tracking_number: tnos_raw[j]
+          tracking_number,
         });
       }
     }
 
-    const payloads = []; // array of new payloads
     for (let i = 0; i < tnos.length; i++) {
       const newPayload = extend({}, payload);
-  
-      newPayload.courier = tnos[i].courier;
+      newPayload.courier = this.guessCourier(tnos[i].courier, payload.destination_country_iso3);
       newPayload.tracking_number = tnos[i].tracking_number;
-  
       payloads.push(newPayload);
     }
 
@@ -237,8 +262,7 @@ export class ParcelLabApi {
    * @return Mapping to actual courier code
    */
   protected guessCourier(input: string, destinationCountryIso3?: string): string {
-    input = this.handleCourierName(input);
-    let output = input;
+    let output = this.handleCourierName(input);
 
     if (params.couriersAppendCountry.includes(output) && destinationCountryIso3) {
       console.warn("Append country code to courier, please check if this is the correct courier you use.")
@@ -274,7 +298,7 @@ export class ParcelLabApi {
    * @param test For testing only, if true this creates a tracking mock
    */
   protected async postTrackingToParcelLabAPI(payload: ParcellabOrder | ParcellabTracking, user: number, token: string, test: boolean) {
-    console.debug('postTrackingToParcelLabAPI', payload);
+    // console.debug('postTrackingToParcelLabAPI', payload);
     
     let url: string;
     if (test) {
@@ -303,7 +327,7 @@ export class ParcelLabApi {
    * @param test For testing only, if true this creates a tracking mock
    */
   protected async postOrderToParcelLabAPI(payload: ParcellabOrder | ParcellabTracking, user: number, token: string, test: boolean) {
-    console.debug('postOrderToParcelLabAPI', payload);
+    // console.debug('postOrderToParcelLabAPI', payload);
     
     let url: string;
     if (test) {

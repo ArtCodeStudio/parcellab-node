@@ -14,17 +14,22 @@ import { keys, contains } from 'underscore';
  * @param arrayOfKeys Keys to be checked for existence
  * @return true if object has all the keys of the array
  */
-export const objHasKeys = (obj: any, arrayOfKeys: string[]): boolean => {
+export const objHasKeys = (obj: any, arrayOfKeys: string[]): {hasAllKeys: boolean, missing: string[]} => {
 
-  let result = true;
+  let hasAllKeys = true;
+  let missing: string[] = [];
 
   for (let i = 0; i < arrayOfKeys.length; i++) {
     if (!obj.hasOwnProperty(arrayOfKeys[i])) {
-      result = false;
+      hasAllKeys = false;
+      missing.push(arrayOfKeys[i]);
     }
   }
 
-  return result;
+  return {
+    hasAllKeys,
+    missing
+  };
 };
 
 /**

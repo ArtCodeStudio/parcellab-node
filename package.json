@@ -1,6 +1,6 @@
 {
   "name": "parcellab",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Unofficial SDK for the parcelLab API for Node.js written in Typescript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -21,7 +21,9 @@
     "package",
     "deliveries",
     "tracking",
-    "typescript"
+    "typescript",
+    "nodejs",
+    "courier"
   ],
   "contributors": [
     "Julian Krenge <julian@parcellab.com> (https://parcellab.com)"
