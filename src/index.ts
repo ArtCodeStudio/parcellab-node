@@ -4,7 +4,7 @@ export * from './utils';
 
 import params from './params';
 import * as utils from './utils';
-import { ParcellabTracking, ParcellabOrder, ParcellabSearchResponse } from './interfaces'
+import { ParcellabTracking, ParcellabOrder, ParcellabSearchResponse, PayloadError } from './interfaces'
 
 // modules
 import got from 'got';
@@ -22,12 +22,12 @@ export class ParcelLabApi {
    * @param token
    */
   constructor(protected user: number, protected token: string) {
-      if (!ø.isInt(user.toString()) || token.length < 30) {
-          throw new Error('Invalid user/ token combination');
-      }
-      
-      this.user = user;
-      this.token = token;
+    if (!ø.isInt(user.toString()) || token.length < 30) {
+      throw new Error('Invalid user/ token combination');
+    }
+    
+    this.user = user;
+    this.token = token;
   }
 
   //////////////////////
@@ -42,10 +42,13 @@ export class ParcelLabApi {
    */
   public async createOrUpdateTracking(payload: ParcellabTracking, test: boolean = false): Promise<string[]> {
     payload = utils.deleteEmptyValues(payload);
-    const { error, isValid} = this.checkPayload(payload, 'tracking');
+    const { error, isValid, invalidKeys} = this.checkPayload(payload, 'tracking');
 
     if (!isValid) {
-      throw new Error(error);
+      console.error('invalidKeys: ' + invalidKeys);
+      const err = new Error(error) as PayloadError;
+      err.invalidKeys = invalidKeys;
+      throw err;
     }
 
     const payloads = this.multiplyOnTrackingNumber(payload);
@@ -265,17 +268,15 @@ export class ParcelLabApi {
     let output = this.handleCourierName(input);
 
     if (params.couriersAppendCountry.includes(output) && destinationCountryIso3) {
-      console.warn("Append country code to courier, please check if this is the correct courier you use.")
       destinationCountryIso3 = destinationCountryIso3.toLowerCase();
       output = `${output}-${destinationCountryIso3}`;
+      console.warn("Append country code to courier, please check if this is the correct courier: " + output);
     }
 
-    try {
-      const knownInputs = keys(params.couriers);
-      if (knownInputs.indexOf(input) > -1) {
-        output = params.couriers[input];
-      }
-    } catch (e) {
+    const knownInputs = keys(params.couriers);
+    if (knownInputs.indexOf(input) > -1) {
+      output = params.couriers[input];
+    } else {
       console.warn('Unknown courier: ' + input);
     }
 

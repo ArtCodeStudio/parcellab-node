@@ -5,6 +5,7 @@ export * from './notifications';
 export * from './optional-keys';
 export * from './order-base';
 export * from './order';
+export * from './payload-error';
 export * from './search-result';
 export * from './special-keys';
 export * from './tracking-base';
