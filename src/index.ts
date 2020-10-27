@@ -275,7 +275,13 @@ export class ParcelLabApi {
 
     if (params.couriersAppendCountry.includes(output) && destinationCountryIso3) {
       destinationCountryIso3 = destinationCountryIso3.toLowerCase();
-      output = `${output}-${destinationCountryIso3}`;
+      const newOutput = `${output}-${destinationCountryIso3}`;
+
+      // Only append destinationCountryIso3 if the resulting courier is known
+      if(params.couriers[newOutput]) {
+        output = newOutput;
+      }
+
       console.warn("Append country code to courier, please check if this is the correct courier: " + output);
     }
 
