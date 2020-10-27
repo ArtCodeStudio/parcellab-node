@@ -246,7 +246,7 @@ export class ParcelLabApi {
 
     for (let i = 0; i < tnos.length; i++) {
       const newPayload = extend({}, payload) as ParcellabOrder | ParcellabTracking;
-      newPayload.courier = this.guessCourier(tnos[i].courier, payload.destination_country_iso3);
+      newPayload.courier = this.guessCourier(tnos[i].courier, payload);
       newPayload.tracking_number = tnos[i].tracking_number;
       payloads.push(newPayload);
     }
@@ -260,6 +260,15 @@ export class ParcelLabApi {
     }
     return courier;
   }
+
+  /**
+   * Removes a substring from a string if the string ends with the substring
+   * @param str String to remove the substring from the end
+   * @param test The substring to remove from the string
+   */
+  protected removeFromEnd(str: string, test: string) {
+    return str.replace(new RegExp(test + '$'), '');
+  }
   
   /**
    * Retrieves courier code from mappings for given courier name if available
@@ -267,17 +276,17 @@ export class ParcelLabApi {
    * @param destinationCountryIso3
    * @return Mapping to actual courier code
    */
-  protected guessCourier(input?: string, destinationCountryIso3?: string): string | undefined {
+  protected guessCourier(input: string, payload: ParcellabOrder | ParcellabTracking): string | undefined {
     if (!input) {
       return input;
     }
     let output: string | undefined = this.handleCourierName(input);
 
-    if (params.couriersAppendCountry.includes(output) && destinationCountryIso3) {
-      destinationCountryIso3 = destinationCountryIso3.toLowerCase();
-      const newOutput = `${output}-${destinationCountryIso3}`;
+    if (params.couriersAppendCountry.includes(output) && payload.destination_country_iso3) {
+      payload.destination_country_iso3 = payload.destination_country_iso3.toLowerCase();
+      const newOutput = `${output}-${payload.destination_country_iso3}`;
 
-      // Only append destinationCountryIso3 if the resulting courier is known
+      // Only append payload.destination_country_iso3 if the resulting courier is known
       if(params.couriers[newOutput]) {
         output = newOutput;
       }
@@ -293,6 +302,11 @@ export class ParcelLabApi {
     }
 
     output = this.handleCourierName(output);
+
+    // Special case for Colis Prive, remove zip from the end of the tracking code
+    if (output === "colisprivee" && payload.zip_code) {
+      output = this.removeFromEnd(output, payload.zip_code)
+    }
 
     return output;
   }
