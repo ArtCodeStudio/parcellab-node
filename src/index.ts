@@ -248,6 +248,12 @@ export class ParcelLabApi {
       const newPayload = extend({}, payload) as ParcellabOrder | ParcellabTracking;
       newPayload.courier = this.guessCourier(tnos[i].courier, payload);
       newPayload.tracking_number = tnos[i].tracking_number;
+
+      // Special case for Colis Prive, remove zip from the end of the tracking code
+      if (newPayload.courier === "colisprivee" && typeof newPayload.tracking_number === 'string' && payload.zip_code) {
+        newPayload.tracking_number = this.removeFromEnd(newPayload.tracking_number, payload.zip_code)
+      }
+
       payloads.push(newPayload);
     }
 
@@ -276,39 +282,34 @@ export class ParcelLabApi {
    * @param destinationCountryIso3
    * @return Mapping to actual courier code
    */
-  protected guessCourier(input: string, payload: ParcellabOrder | ParcellabTracking): string | undefined {
-    if (!input) {
-      return input;
+  protected guessCourier(courier: string, payload: ParcellabOrder | ParcellabTracking): string | undefined {
+    if (!courier) {
+      return courier;
     }
-    let output: string | undefined = this.handleCourierName(input);
+    courier = this.handleCourierName(courier);
 
-    if (params.couriersAppendCountry.includes(output) && payload.destination_country_iso3) {
+    if (params.couriersAppendCountry.includes(courier) && payload.destination_country_iso3) {
       payload.destination_country_iso3 = payload.destination_country_iso3.toLowerCase();
-      const newOutput = `${output}-${payload.destination_country_iso3}`;
+      const newOutput = `${courier}-${payload.destination_country_iso3}`;
 
       // Only append payload.destination_country_iso3 if the resulting courier is known
       if(params.couriers[newOutput]) {
-        output = newOutput;
+        courier = newOutput;
       }
 
-      console.warn("Append country code to courier, please check if this is the correct courier: " + output);
+      console.warn("Append country code to courier, please check if this is the correct courier: " + courier);
     }
 
     const knownInputs = keys(params.couriers);
-    if (knownInputs.indexOf(input) > -1) {
-      output = params.couriers[input];
+    if (knownInputs.indexOf(courier) > -1) {
+      courier = params.couriers[courier];
     } else {
-      console.warn('Unknown courier: ' + input);
+      console.warn('Unknown courier: ' + courier);
     }
 
-    output = this.handleCourierName(output);
+    courier = this.handleCourierName(courier);
 
-    // Special case for Colis Prive, remove zip from the end of the tracking code
-    if (output === "colisprivee" && payload.zip_code) {
-      output = this.removeFromEnd(output, payload.zip_code)
-    }
-
-    return output;
+    return courier;
   }
   
   ////////////////
