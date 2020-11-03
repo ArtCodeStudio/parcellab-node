@@ -294,10 +294,10 @@ export class ParcelLabApi {
 
       // Only append payload.destination_country_iso3 if the resulting courier is known
       if(params.couriers[newOutput]) {
+        console.warn("Append country code to courier, please check if this is the correct courier: " + courier);
         courier = newOutput;
       }
-
-      console.warn("Append country code to courier, please check if this is the correct courier: " + courier);
+      
     }
 
     const knownInputs = keys(params.couriers);
