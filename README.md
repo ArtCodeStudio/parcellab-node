@@ -88,9 +88,9 @@ var payload = {
 };
 ```
 
-### Contributing
+## Contributing
 
-Bug Reporting
+### Bug Reporting
 
 * Ensure the bug can be reproduced on the latest master.
 * If there is a problem with a particular courier, please let us know the tracking number and courier
