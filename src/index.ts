@@ -305,12 +305,14 @@ export class ParcelLabApi {
       if (typeof newPayload.tracking_number === 'string') {
 
         if (this.autoDetectCourier) {
-          const detectedCourier = this.detector.getCourier(newPayload.tracking_number);
+          const detectedCouriers = this.detector.getCouriers(newPayload.tracking_number);
 
-          if (!detectedCourier) {
+          if (detectedCouriers.length <= 0) {
             this.log.warn(`Can't validate courier "${newPayload.courier}" for for tracking number "${newPayload.tracking_number}", please create pull request or issue on https://github.com/ArtCodeStudio/parcellab-node to add support for this courier in pacellab-node or ignore this message if everything works for you.`);
           } else {
-            if (newPayload.courier !== detectedCourier) {
+            const index = detectedCouriers.indexOf(newPayload.courier);
+            if (index === -1) {
+              const detectedCourier = detectedCouriers[0];
               this.log.warn(`Wrong courier code "${newPayload.courier}" for tracking number "${newPayload.tracking_number}" detected, courier code corrected to "${detectedCourier}. If this is the wrong courier, disable the automatic detection, create a pull request or issue to correct this on https://github.com/ArtCodeStudio/parcellab-node`);
               newPayload.courier = detectedCourier;
             } else {

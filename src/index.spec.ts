@@ -29,7 +29,7 @@ class ParcelLabApiTest extends ParcelLabApi {
                 });
 
 
-                it('Should split the tracking number "09445440538272Z,094454405382712" and detect both as "dpd"', () => {
+                it('Should split the tracking number "09445440538272Z,094454405382712" and detect both as "dpd-de"', () => {
                     const payload = this.multiplyOnTrackingNumber({
                         courier: 'colisprivee',
                         tracking_number: '09445440538272Z,094454405382712',
@@ -45,7 +45,7 @@ class ParcelLabApiTest extends ParcelLabApi {
                     strictEqual(payload[1].courier, "dpd-de");
                 });
 
-                it('Should detect the tracking number "H1000730000834301047" as "hermes"', () => {
+                it('Should detect the tracking number "H1000730000834301047" as "hermes-de"', () => {
                     const payload = this.multiplyOnTrackingNumber({
                         courier: 'dhl',
                         tracking_number: 'H1000730000834301047',

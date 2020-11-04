@@ -11,15 +11,12 @@ import { CourierDetectorList } from './interfaces';
  */
 export class CourierDetector {
 
-    constructor() {/***/}
-
     couriers: CourierDetectorList = {
         /**
          * UPS tracking numbers usually begin with "1Z", contain 18 characters, and do not contain the letters "O", "I", or "Q".
          * E.g. 1Z0370A00400378664
          */
         ups: {
-            code: 'ups',
             patterns: [new RegExp(/\b(1Z ?[0-9A-Z]{3} ?[0-9A-Z]{3} ?[0-9A-Z]{2} ?[0-9A-Z]{4} ?[0-9A-Z]{3} ?[0-9A-Z]|T\d{3} ?\d{4} ?\d{3})\b/i)],
             tracking_url: (trackNum: string) => `https://wwwapps.ups.com/WebTracking/processInputRequest?AgreeToTermsAndConditions=yes&loc=en_US&tracknum=${trackNum}&Requester=trkinppg`
         },
@@ -28,7 +25,6 @@ export class CourierDetector {
          * USPS Tracking numbers are normally 20-22 digits long and do not contain letters AND USPS Express Mail tracking numbers are normally 13 characters long, begin with two letters, and end with "US".
          */
         usps: {
-            code: 'usps',
             patterns: [
                 new RegExp(/\b((420 ?\d{5} ?)?(91|92|93|94|95|01|03|04|70|23|13)\d{2} ?\d{4} ?\d{4} ?\d{4} ?\d{4}( ?\d{2,6})?)\b/i), new RegExp(/\b((M|P[A-Z]?|D[C-Z]|LK|E[A-C]|V[A-Z]|R[A-Z]|CP|CJ|LC|LJ) ?\d{3} ?\d{3} ?\d{3} ?[A-Z]?[A-Z]?)\b/i), new RegExp(/\b(82 ?\d{3} ?\d{3} ?\d{2})\b/i)
             ],
@@ -39,7 +35,6 @@ export class CourierDetector {
          * 
          */
         ontrac: {
-            code: 'ontrac',
             patterns: [new RegExp(/\b(C\d{14})\b/i)],
             tracking_url: (trackNum: string) => `http://www.ontrac.com/trackres.asp?tracking_number=${trackNum}`
         },
@@ -48,7 +43,6 @@ export class CourierDetector {
          * DHL Espress / International tracking numbers are normally 10 or 11 digits long and do not contain letters.
          */
         dhl: {
-            code: 'dhl',
             patterns: [new RegExp(/\b(\d{4}[- ]?\d{4}[- ]?\d{2}|\d{3}[- ]?\d{8}|[A-Z]{3}\d{7})\b/i)],
             tracking_url: (trackNum: string) => `http://www.dhl.com/en/express/tracking.html?AWB=${trackNum}&brand=DHL`
         },
@@ -58,7 +52,6 @@ export class CourierDetector {
          * Or 20 numeric digits (00340434463400054439)
          */
         'dhl-germany': {
-            code: 'dhl-germany',
             patterns: [new RegExp('^[A-Z]{2}[0-9]{9}DE$'), new RegExp('^[0-9]{20}$')],
             tracking_url: (trackNum: string) => `https://www.dhl.de/de/privatkunden/dhl-sendungsverfolgung.html?piececode=${trackNum}`
         },
@@ -68,7 +61,6 @@ export class CourierDetector {
          * WARNING fedex can also have 15 numeric digits!
          */
         'dpd-de': {
-            code: 'dpd-de',
             patterns: [new RegExp('^09[0-9]{12}[A-Z0-9]{1}$')],
             tracking_url: (trackNum: string) => `https://tracking.dpd.de/status/de_DE/parcel/${trackNum}`
         },
@@ -77,7 +69,6 @@ export class CourierDetector {
          * FedEx Express tracking numbers are normally 12 digits long and do not contain letters AND FedEx Ground tracking numbers are normally 15 digits long and do not contain letters.
          */
         fedex: {
-            code: 'fedex',
             patterns: [new RegExp(/\b(((96\d\d|6\d)\d{3} ?\d{4}|96\d{2}|\d{4}) ?\d{4} ?\d{4}( ?\d{3})?)\b/i)],
             tracking_url: (trackNum: string) => `https://www.fedex.com/apps/fedextrack/index.html?tracknumber=${trackNum}`
         },
@@ -87,7 +78,6 @@ export class CourierDetector {
          * TODO check key name
          */
         'post-ca': {
-            code: 'post-ca',
             patterns: [new RegExp('^[0-9]{16}$|^[A-Z]{2}[0-9]{9}[A-Z]{2}$')],
             tracking_url: (trackNum: string) => `https://www.canadapost.ca/trackweb/en#/search?searchFor=${trackNum}`
         },
@@ -96,7 +86,6 @@ export class CourierDetector {
          * Starts with Z and ends with 16 numeric digits. The last 5 numeric digits are the zip code (Z6100130653673000)
          */
         colisprivee: {
-            code: 'colisprivee',
             patterns: [new RegExp('^Z[0-9]{16}$')],
             tracking_url: (trackNum: string) => `https://www.colisprive.com/moncolis/pages/detailColis.aspx?numColis=${trackNum}`
         },
@@ -105,11 +94,24 @@ export class CourierDetector {
          * Starts with H and ends with 19 numeric digits (H1000730000834301047)
          */
         'hermes-de': {
-            code: 'hermes-de',
             patterns: [new RegExp('^H[0-9]{19}$')],
             tracking_url: (trackNum: string) => `https://www.myhermes.de/empfangen/sendungsverfolgung/sendungsinformation/#${trackNum}`
         },
 
+        /**
+         * Starts with 2 alphabetic or numeric digits and ends with 10 or 11 numeric digits
+         */
+        'wn-direct': {
+            patterns: [new RegExp('^[A-Z0-9]{2}[0-9]{10}$'), new RegExp('^[A-Z0-9]{2}[0-9]{11}$')],
+            tracking_url: (trackNum: string) => `https://uktracking.asendia.com/tracking.php?ref=${trackNum}`
+        }
+    }
+
+    constructor() {
+        // Courier alias
+        this.couriers['dpd-benelux'] = this.couriers['dpd-de'];
+        this.couriers['dpd-uk'] = this.couriers['dpd-de'];
+        this.couriers['dpd-benelux'] = this.couriers['dpd-de'];
     }
 
     getCouriers(trackNum: string) {

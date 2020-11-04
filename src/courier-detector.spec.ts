@@ -80,6 +80,17 @@ describe('CourierDetector', () => {
       strictEqual(courier, "colisprivee");
     });
 
+    // wn-direct
+    it('"RG0000007949" should be detected as "wn-direct"', () => {
+      const courier = detector.getCourier("RG0000007949");
+      strictEqual(courier, "wn-direct");
+    });
+
+    it('"9L27236131798" should be detected as "wn-direct"', () => {
+      const courier = detector.getCourier("9L27236131798");
+      strictEqual(courier, "wn-direct");
+    });
+     
   });
 
 });
