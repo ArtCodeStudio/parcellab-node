@@ -6,14 +6,14 @@ describe('CourierDetector', () => {
 
   describe('getCourier', () => {
     // hermes
-    it('"H1000730000834301047" should be detected as "hermes"', () => {
+    it('"H1000730000834301047" should be detected as "hermes-de"', () => {
       const courier = detector.getCourier("H1000730000834301047");
-      strictEqual(courier, "hermes");
+      strictEqual(courier, "hermes-de");
     });
 
-    it('"H1000730000173901032" should be detected as "hermes"', () => {
+    it('"H1000730000173901032" should be detected as "hermes-de"', () => {
       const courier = detector.getCourier("H1000730000173901032");
-      strictEqual(courier, "hermes");
+      strictEqual(courier, "hermes-de");
     });
 
     // dhl-germany
@@ -28,34 +28,34 @@ describe('CourierDetector', () => {
     });
     
     // dpd
-    it('"09445440528378N" should be detected as "dpd"', () => {
+    it('"09445440528378N" should be detected as "dpd-de"', () => {
       const courier = detector.getCourier("09445440528378N");
-      strictEqual(courier, "dpd");
+      strictEqual(courier, "dpd-de");
     });
     
-    it('"09445440528275T" should be detected as "dpd"', () => {
+    it('"09445440528275T" should be detected as "dpd-de"', () => {
       const courier = detector.getCourier("09445440528275T");
-      strictEqual(courier, "dpd");
+      strictEqual(courier, "dpd-de");
     });
 
-    it('"09445440528213M" should be detected as "dpd"', () => {
+    it('"09445440528213M" should be detected as "dpd-de"', () => {
       const courier = detector.getCourier("09445440528213M");
-      strictEqual(courier, "dpd");
+      strictEqual(courier, "dpd-de");
     });
 
-    it('"094454405280792" should be detected as "dpd"', () => {
+    it('"094454405280792" should be detected as "dpd-de"', () => {
       const courier = detector.getCourier("094454405280792");
-      strictEqual(courier, "dpd");
+      strictEqual(courier, "dpd-de");
     });
 
-    it('"094454405282712" should be detected as "dpd"', () => {
+    it('"094454405282712" should be detected as "dpd-de"', () => {
       const courier = detector.getCourier("094454405282712");
-      strictEqual(courier, "dpd");
+      strictEqual(courier, "dpd-de");
     });
 
-    it('"09445440528372Z" should be detected as "dpd"', () => {
+    it('"09445440528372Z" should be detected as "dpd-de"', () => {
       const courier = detector.getCourier("09445440528372Z");
-      strictEqual(courier, "dpd");
+      strictEqual(courier, "dpd-de");
     });
     
     // ups

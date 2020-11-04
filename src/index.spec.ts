@@ -40,9 +40,9 @@ class ParcelLabApiTest extends ParcelLabApi {
 
                     strictEqual(payload.length, 2);
                     strictEqual(payload[0].tracking_number, "09445440538272Z");
-                    strictEqual(payload[0].courier, "dpd");
+                    strictEqual(payload[0].courier, "dpd-de");
                     strictEqual(payload[1].tracking_number, "094454405382712");
-                    strictEqual(payload[1].courier, "dpd");
+                    strictEqual(payload[1].courier, "dpd-de");
                 });
 
                 it('Should detect the tracking number "H1000730000834301047" as "hermes"', () => {
@@ -56,7 +56,7 @@ class ParcelLabApiTest extends ParcelLabApi {
 
                     strictEqual(payload.length, 1);
                     strictEqual(payload[0].tracking_number, "H1000730000834301047");
-                    strictEqual(payload[0].courier, "hermes");
+                    strictEqual(payload[0].courier, "hermes-de");
                 });
 
             });
