@@ -26,9 +26,15 @@ git clone https://github.com/ArtCodeStudio/parcellab-node.git
 
 You can find an Javascript and Typescript example in [examples](https://github.com/ArtCodeStudio/parcellab-node/tree/main/examples):
 
-```javascript
-const { ParcelLabApi } = require('parcellab');
-const parcellab = new ParcelLabApi(1, 'ParcelLabApitoken-30characters');
+```typescript
+import { ParcelLabApi } from ('parcellab'); // or const { ParcelLabApi } = require('parcellab');
+
+const user = 1;
+const token = 'ParcelLabApitoken-30characters';
+const autoDetectCourier = true;
+const logLevel = 2; // warn and error 
+
+const parcellab = new ParcelLabApi(1, token, autoDetectCourier, logLevel);
 
 const payloadTracking = {
   courier: 'dhl-germany',

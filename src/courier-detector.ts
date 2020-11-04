@@ -54,7 +54,7 @@ export class CourierDetector {
         },
 
         /**
-         * Starts with 2 numbers, following by 9 numeric digits and ends with DE (CR236025058DE)
+         * Starts with 2 numbers, following by 9 numeric digits and ends with DE (CR236035058DE)
          * Or 20 numeric digits (00340434463400054439)
          */
         'dhl-germany': {
@@ -64,7 +64,7 @@ export class CourierDetector {
         },
 
         /**
-         * Starts with 09 following by 12 more numeric digits and ends with a alphabetic character or a numeric digit (09445440528278N)
+         * Starts with 09 following by 12 more numeric digits and ends with a alphabetic character or a numeric digit (09445440528378N)
          * WARNING fedex can also have 15 numeric digits!
          */
         dpd: {
@@ -93,7 +93,7 @@ export class CourierDetector {
         },
 
         /**
-         * Starts with Z and ends with 16 numeric digits. The last 5 numeric digits are the zip code (Z6100130652673000)
+         * Starts with Z and ends with 16 numeric digits. The last 5 numeric digits are the zip code (Z6100130653673000)
          */
         colisprivee: {
             code: 'colisprivee',
@@ -102,7 +102,7 @@ export class CourierDetector {
         },
 
         /**
-         * Starts with H and ends with 19 numeric digits (H1000730000824301047)
+         * Starts with H and ends with 19 numeric digits (H1000730000834301047)
          */
         hermes: {
             code: 'hermes',

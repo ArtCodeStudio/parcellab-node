@@ -5,7 +5,7 @@ export * from './utils';
 import params from './params';
 import * as utils from './utils';
 import { CourierDetector } from './courier-detector';
-import { ParcellabTracking, ParcellabOrder, ParcellabSearchResponse, PayloadError } from './interfaces'
+import { ParcellabTracking, ParcellabOrder, ParcellabSearchResponse, PayloadError, LogLevel } from './interfaces'
 
 // modules
 import got from 'got';
@@ -19,21 +19,55 @@ import { stringify as QueryString } from 'querystring';
  */
 export class ParcelLabApi {
 
-
   public detector = new CourierDetector();
 
+  protected log = {
+    info(...data: any[]): void {
+      // Ignore
+    },
+    debug(...data: any[]): void {
+      // Ignore
+    },
+    warn(...data: any[]): void {
+      // Ignore
+    },
+    error(...data: any[]): void {
+      // Ignore
+    },
+  }
+
   /**
-   * @param user
-   * @param token
+   * @param user parcellab user
+   * @param token parcellab token
+   * @param autoDetectCourier disable / enable autodetection of courier by tracking number. Enabled by default
+   * @param logLevel log level, warn and error by default
    */
-  constructor(protected user: number, protected token: string) {
+  constructor(protected user: number, protected token: string, protected autoDetectCourier = true, protected logLevel: LogLevel = LogLevel.Warn) {
     if (!ø.isInt(user.toString()) || token.length < 30) {
       throw new Error('Invalid user/ token combination');
+    }
+
+    if (this.logLevel >= LogLevel.Info) {
+      this.log.info = console.info;
+    }
+    if (this.logLevel >= LogLevel.Debug) {
+      this.log.debug = console.debug;
+    }
+    if (this.logLevel >= LogLevel.Warn) {
+      this.log.warn = console.warn;
+    }
+    if (this.logLevel >= LogLevel.Debug) {
+      this.log.debug = console.debug;
+    }
+    if (this.logLevel >= LogLevel.Error) {
+      this.log.error = console.error;
     }
     
     this.user = user;
     this.token = token;
   }
+
+
 
   //////////////////////
   // Public Functions //
@@ -50,7 +84,7 @@ export class ParcelLabApi {
     const { error, isValid, invalidKeys} = this.checkPayload(payload, 'tracking');
 
     if (!isValid) {
-      console.error('invalidKeys: ' + invalidKeys);
+      this.log.error('invalidKeys: ' + invalidKeys);
       const err = new Error(error) as PayloadError;
       err.invalidKeys = invalidKeys;
       throw err;
@@ -255,14 +289,17 @@ export class ParcelLabApi {
       newPayload.tracking_number = tnos[i].tracking_number;
 
       if (typeof newPayload.tracking_number === 'string') {
-        const detectedCourier = this.detector.getCourier(newPayload.tracking_number);
 
-        if (!detectedCourier) {
-          console.warn(`[validateCourier] Can't validate courier "${newPayload.courier}" for for tracking number "${newPayload.tracking_number}"`);
-        } else {
-          if (newPayload.courier !== detectedCourier) {
-            console.warn(`Wrong courier "${newPayload.courier}" (detected: "${detectedCourier}") for tracking number "${newPayload.tracking_number}" found!`);
-            newPayload.courier = detectedCourier;
+        if (this.autoDetectCourier) {
+          const detectedCourier = this.detector.getCourier(newPayload.tracking_number);
+
+          if (!detectedCourier) {
+            this.log.warn(`Can't validate courier "${newPayload.courier}" for for tracking number "${newPayload.tracking_number}", please create pull request or issue on https://github.com/ArtCodeStudio/parcellab-node to add support for this courier in pacellab-node or ignore this message if everything works for you.`);
+          } else {
+            if (newPayload.courier !== detectedCourier) {
+              this.log.warn(`Wrong courier "${newPayload.courier}" for tracking number "${newPayload.tracking_number}" detected, corrected to "${detectedCourier}. If this is the wrong courier, disable the automatic detection, create a pull request or issue to correct this on https://github.com/ArtCodeStudio/parcellab-node`);
+              newPayload.courier = detectedCourier;
+            }
           }
         }
 
@@ -313,7 +350,7 @@ export class ParcelLabApi {
       // Only append payload.destination_country_iso3 if the resulting courier is known
       if(params.couriers[newOutput]) {
         courier = newOutput;
-        console.warn("Append country code to courier, please check if this is the correct courier: " + courier);
+        this.log.warn(`Append country code to courier, please check if this is the correct courier ${courier}, if not append the country code by your self before you send them to parcellab.`);
       }
       
     }
@@ -322,7 +359,7 @@ export class ParcelLabApi {
     if (knownInputs.indexOf(courier) > -1) {
       courier = params.couriers[courier];
     } else {
-      console.warn('Unknown courier: ' + courier);
+      this.log.warn('Unknown courier: ' + courier);
     }
 
     courier = this.handleCourierName(courier);
@@ -344,7 +381,7 @@ export class ParcelLabApi {
    * @param test For testing only, if true this creates a tracking mock
    */
   protected async postTrackingToParcelLabAPI(payload: ParcellabOrder | ParcellabTracking, user: number, token: string, test: boolean) {
-    // console.debug('postTrackingToParcelLabAPI', payload);
+    this.log.debug('postTrackingToParcelLabAPI', payload);
     
     let url: string;
     if (test) {
@@ -357,7 +394,7 @@ export class ParcelLabApi {
 
     if (test) {
       const mock = await this.validateMostRecentTracking(this.user, this.token);
-      console.debug("postTrackingToParcelLabAPI mock", mock);
+      this.log.debug("postTrackingToParcelLabAPI mock", mock);
     }
 
     return res;
@@ -373,7 +410,7 @@ export class ParcelLabApi {
    * @param test For testing only, if true this creates a tracking mock
    */
   protected async postOrderToParcelLabAPI(payload: ParcellabOrder | ParcellabTracking, user: number, token: string, test: boolean) {
-    // console.debug('postOrderToParcelLabAPI', payload);
+    this.log.debug('postOrderToParcelLabAPI', payload);
     
     let url: string;
     if (test) {
@@ -437,7 +474,7 @@ export class ParcelLabApi {
       url = url + (queryStr && queryStr.length > 0 ? "?" + queryStr : "");
     }
 
-    // console.debug('request url ' + method, url);
+    this.log.debug('request url ' + method, url);
 
     const gotOptions = {
       agent: {

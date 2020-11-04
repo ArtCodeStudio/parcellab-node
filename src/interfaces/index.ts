@@ -2,6 +2,7 @@ export * from './article';
 export * from './courier-detector';
 export * from './courier-detector-list';
 export * from './courier';
+export * from './log-level';
 export * from './multishop';
 export * from './notifications';
 export * from './optional-keys';
