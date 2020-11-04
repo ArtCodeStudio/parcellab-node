@@ -67,8 +67,8 @@ export class CourierDetector {
          * Starts with 09 following by 12 more numeric digits and ends with a alphabetic character or a numeric digit (09445440528378N)
          * WARNING fedex can also have 15 numeric digits!
          */
-        dpd: {
-            code: 'dpd',
+        'dpd-de': {
+            code: 'dpd-de',
             patterns: [new RegExp('^09[0-9]{12}[A-Z0-9]{1}$')],
             tracking_url: (trackNum: string) => `https://tracking.dpd.de/status/de_DE/parcel/${trackNum}`
         },
