@@ -1,6 +1,6 @@
 {
   "name": "parcellab",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "Unofficial SDK for the parcelLab API for Node.js written in Typescript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

@@ -64,12 +64,10 @@ const params = {
   couriers: {
     //////////
     // Okay //
-    //////////
-
-    // Other ?
-    "wn-direct": "wn-direct",
+    //////////   
 
     // Global
+    "wn-direct": "wn-direct", // WNDirect
     "dhl": "dhl", // DHL-Express
     "ups": "ups", // UPS / UPS-Express
     "fedex": "fedex",
@@ -185,6 +183,7 @@ const params = {
     ///////////////
     // Transform //
     ///////////////
+    "wnd": "wn-direct",
     "dhl-express": "dhl",
     "dhlp": "dhl-germany", // DHL Parcel
     "dpdhl": "dhl-germany", // Deutsche Post DHL
