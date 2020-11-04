@@ -2,6 +2,10 @@
 
 This is a simple unofficial wrapper to interface the parcelLab API to [Node.js](https://nodejs.org/), based on [this project](https://bitbucket.org/parcellab/sdk-node) but rewritten in Typescript.
 
+## Shopify
+
+If you need the parcelLab API for a Shopify store we already have a ready to use integration for you, we can also adapt the integration to your needs, just contact us at hi@artandcode.studio.
+
 ## Background
 
 To use the API, you have to have a set of valid credentials (`user` and `token`) from [parcelLab](https://portal.parcellab.com/).
@@ -31,8 +35,8 @@ import { ParcelLabApi } from ('parcellab'); // or const { ParcelLabApi } = requi
 
 const user = 1;
 const token = 'ParcelLabApitoken-30characters';
-const autoDetectCourier = true;
-const logLevel = 3; // info, warn and error 
+const autoDetectCourier = true; // By default true, set this to false if you do want to detect / validate the courier by tracking number
+const logLevel = 3; // By default 3, 3 logs info, warn and error messages 
 
 const parcellab = new ParcelLabApi(1, token, autoDetectCourier, logLevel);
 
@@ -84,9 +88,20 @@ var payload = {
 };
 ```
 
-## Connect your Store with parcelLab
+### Contributing
 
-If you own a Shopify store we already have a ready to use connection for you, just contact us at hi@artandcode.studio.
+Bug Reporting
+
+* Ensure the bug can be reproduced on the latest master.
+* If there is a problem with a particular courier, please let us know the tracking number and courier
+* For privacy reasons, please change some digits of the tracking number, even if you use them in tests
+* Do not publish any other private data 
+
+### Pull Requests
+
+* Fork the repository and create a topic branch.
+* Include tests that cover any changes or additions that you've made.
+* Push your topic branch to your fork and submit a pull request. Include details about the changes as well as a reference to related issue(s).
 
 ## License (ISC)  
 
