@@ -4,6 +4,7 @@ export * from './utils';
 
 import params from './params';
 import * as utils from './utils';
+import { CourierDetector } from './courier-detector';
 import { ParcellabTracking, ParcellabOrder, ParcellabSearchResponse, PayloadError } from './interfaces'
 
 // modules
@@ -17,6 +18,10 @@ import { stringify as QueryString } from 'querystring';
  * Based on https://bitbucket.org/parcellab/sdk-node/src/master/index.js
  */
 export class ParcelLabApi {
+
+
+  public detector = new CourierDetector();
+
   /**
    * @param user
    * @param token
@@ -249,9 +254,22 @@ export class ParcelLabApi {
       newPayload.courier = this.guessCourier(tnos[i].courier, payload);
       newPayload.tracking_number = tnos[i].tracking_number;
 
-      // Special case for Colis Prive, remove zip from the end of the tracking code
-      if (newPayload.courier === "colisprivee" && typeof newPayload.tracking_number === 'string' && payload.zip_code) {
-        newPayload.tracking_number = this.removeFromEnd(newPayload.tracking_number, payload.zip_code)
+      if (typeof newPayload.tracking_number === 'string') {
+        const detectedCourier = this.detector.getCourier(newPayload.tracking_number);
+
+        if (!detectedCourier) {
+          console.warn(`[validateCourier] Can't validate courier "${newPayload.courier}" for for tracking number "${newPayload.tracking_number}"`);
+        } else {
+          if (newPayload.courier !== detectedCourier) {
+            console.warn(`Wrong courier "${newPayload.courier}" (detected: "${detectedCourier}") for tracking number "${newPayload.tracking_number}" found!`);
+            newPayload.courier = detectedCourier;
+          }
+        }
+
+        // Special case for Colis Prive, remove zip from the end of the tracking code
+        if (newPayload.courier === "colisprivee" && payload.zip_code) {
+          newPayload.tracking_number = this.removeFromEnd(newPayload.tracking_number, payload.zip_code)
+        }
       }
 
       payloads.push(newPayload);
@@ -294,8 +312,8 @@ export class ParcelLabApi {
 
       // Only append payload.destination_country_iso3 if the resulting courier is known
       if(params.couriers[newOutput]) {
-        console.warn("Append country code to courier, please check if this is the correct courier: " + courier);
         courier = newOutput;
+        console.warn("Append country code to courier, please check if this is the correct courier: " + courier);
       }
       
     }

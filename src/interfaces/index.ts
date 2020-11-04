@@ -1,4 +1,6 @@
 export * from './article';
+export * from './courier-detector';
+export * from './courier-detector-list';
 export * from './courier';
 export * from './multishop';
 export * from './notifications';

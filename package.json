@@ -1,11 +1,11 @@
 {
   "name": "parcellab",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Unofficial SDK for the parcelLab API for Node.js written in Typescript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "ts-node ./test/index.ts",
+    "test": "mocha",
     "build": "npm run clear && tsc",
     "clear": "rm dist/* -rf"
   },
@@ -41,8 +41,11 @@
     "validator": "^13.1.17"
   },
   "devDependencies": {
+    "@types/mocha": "^8.0.3",
     "@types/underscore": "^1.10.24",
     "@types/validator": "^13.1.0",
+    "assert": "^2.0.0",
+    "mocha": "^8.2.1",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.5"
   }
