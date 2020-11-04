@@ -32,7 +32,7 @@ import { ParcelLabApi } from ('parcellab'); // or const { ParcelLabApi } = requi
 const user = 1;
 const token = 'ParcelLabApitoken-30characters';
 const autoDetectCourier = true;
-const logLevel = 2; // warn and error 
+const logLevel = 3; // info, warn and error 
 
 const parcellab = new ParcelLabApi(1, token, autoDetectCourier, logLevel);
 

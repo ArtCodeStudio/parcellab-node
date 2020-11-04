@@ -40,24 +40,34 @@ export class ParcelLabApi {
    * @param user parcellab user
    * @param token parcellab token
    * @param autoDetectCourier disable / enable autodetection of courier by tracking number. Enabled by default
-   * @param logLevel log level, warn and error by default
+   * @param logLevel log level, info, warn and error enabled by default
    */
-  constructor(protected user: number, protected token: string, protected autoDetectCourier = true, protected logLevel: LogLevel = LogLevel.Warn) {
+  constructor(protected user: number, protected token: string, protected autoDetectCourier = true, protected logLevel: LogLevel = LogLevel.Info) {
+
+    // Validate user and token
     if (!ø.isInt(user.toString()) || token.length < 30) {
       throw new Error('Invalid user/ token combination');
     }
 
+    // Set default value for autoDetectCourier
+    if (typeof autoDetectCourier === 'undefined') {
+      autoDetectCourier = true;
+    }
+
+    // Set default value for logLevel
+    if (typeof logLevel === 'undefined') {
+      logLevel = LogLevel.Info;
+    }
+
+    // Enable log levels
+    if (this.logLevel >= LogLevel.Debug) {
+      this.log.debug = console.debug;
+    }
     if (this.logLevel >= LogLevel.Info) {
       this.log.info = console.info;
     }
-    if (this.logLevel >= LogLevel.Debug) {
-      this.log.debug = console.debug;
-    }
     if (this.logLevel >= LogLevel.Warn) {
       this.log.warn = console.warn;
-    }
-    if (this.logLevel >= LogLevel.Debug) {
-      this.log.debug = console.debug;
     }
     if (this.logLevel >= LogLevel.Error) {
       this.log.error = console.error;
@@ -65,6 +75,8 @@ export class ParcelLabApi {
     
     this.user = user;
     this.token = token;
+    this.autoDetectCourier = autoDetectCourier;
+    this.logLevel = logLevel;
   }
 
 
@@ -297,8 +309,10 @@ export class ParcelLabApi {
             this.log.warn(`Can't validate courier "${newPayload.courier}" for for tracking number "${newPayload.tracking_number}", please create pull request or issue on https://github.com/ArtCodeStudio/parcellab-node to add support for this courier in pacellab-node or ignore this message if everything works for you.`);
           } else {
             if (newPayload.courier !== detectedCourier) {
-              this.log.warn(`Wrong courier "${newPayload.courier}" for tracking number "${newPayload.tracking_number}" detected, corrected to "${detectedCourier}. If this is the wrong courier, disable the automatic detection, create a pull request or issue to correct this on https://github.com/ArtCodeStudio/parcellab-node`);
+              this.log.warn(`Wrong courier code "${newPayload.courier}" for tracking number "${newPayload.tracking_number}" detected, courier code corrected to "${detectedCourier}. If this is the wrong courier, disable the automatic detection, create a pull request or issue to correct this on https://github.com/ArtCodeStudio/parcellab-node`);
               newPayload.courier = detectedCourier;
+            } else {
+              this.log.info(`Courier code "${newPayload.courier}" is valid`);
             }
           }
         }
@@ -349,8 +363,8 @@ export class ParcelLabApi {
 
       // Only append payload.destination_country_iso3 if the resulting courier is known
       if(params.couriers[newOutput]) {
+        this.log.warn(`Append country code "${payload.destination_country_iso3}" to courier ${courier}, please check if this is the correct courier code "${newOutput}", if not append the country code by your self before you send them to parcellab.`);
         courier = newOutput;
-        this.log.warn(`Append country code to courier, please check if this is the correct courier ${courier}, if not append the country code by your self before you send them to parcellab.`);
       }
       
     }

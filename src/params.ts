@@ -186,7 +186,7 @@ const params = {
     // Transform //
     ///////////////
     "dhl-express": "dhl",
-    "dhlp": "dhl-germany",
+    "dhlp": "dhl-germany", // DHL Parcel
     "dpdhl": "dhl-germany", // Deutsche Post DHL
     "hermes-germany": "hermes-de",
     "hermes": "hermes-de",
