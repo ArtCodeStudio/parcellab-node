@@ -74,3 +74,23 @@ export const deleteEmptyValues = (data: any) => {
   }
   return data;
 }
+
+/**
+ * Removes a substring from a string if the string ends with the substring
+ * @param str String to remove the substring from the end
+ * @param test The substring to remove from the string
+ */
+export const removeFromEnd = (str: string, test: string) => {
+  return str.replace(new RegExp(test + '$'), '');
+}
+
+/**
+ * Handle string, converts a string "Abc def" to "avc-def"
+ * @param str 
+ */
+export const handle = (str?: string) => {
+  if (str) {
+    return str.trim().toLowerCase().replace(/\s/g,"-");
+  }
+  return str;
+}

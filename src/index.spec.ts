@@ -1,10 +1,15 @@
 import { strictEqual } from "assert";
-import { ParcelLabApi } from "./index";
+import { ParcelLabApi, LogLevel } from "./index";
 
 const user = 1;
 const token = 'parcelLabAPItoken-30characters';
 
 class ParcelLabApiTest extends ParcelLabApi {
+
+    constructor() {
+        super(user, token, true, LogLevel.None)
+    }
+
     run() {
 
         describe('ParcelLabApi', () => {
@@ -13,17 +18,18 @@ class ParcelLabApiTest extends ParcelLabApi {
                 it("Zip should be removed from colisprivee tracking number", () => {
                     const payload = this.multiplyOnTrackingNumber({
                         courier: 'colisprivee',
-                        tracking_number: 'Z6100136949933320',
-                        zip_code: '33320',
+                        tracking_number: 'Z6100136949912345',
+                        zip_code: '12345',
                         articles: [],
                         destination_country_iso3: 'fr',
                     });
 
+                    strictEqual(payload.length, 1);
                     strictEqual(payload[0].tracking_number, 'Z61001369499');
                 });
 
 
-                it('Zip should split the tracking number "09445440538272Z,094454405382712" and detect them as "dpd"', () => {
+                it('Should split the tracking number "09445440538272Z,094454405382712" and detect both as "dpd"', () => {
                     const payload = this.multiplyOnTrackingNumber({
                         courier: 'colisprivee',
                         tracking_number: '09445440538272Z,094454405382712',
@@ -38,11 +44,26 @@ class ParcelLabApiTest extends ParcelLabApi {
                     strictEqual(payload[1].tracking_number, "094454405382712");
                     strictEqual(payload[1].courier, "dpd");
                 });
+
+                it('Should detect the tracking number "H1000730000834301047" as "hermes"', () => {
+                    const payload = this.multiplyOnTrackingNumber({
+                        courier: 'dhl',
+                        tracking_number: 'H1000730000834301047',
+                        zip_code: '12345',
+                        articles: [],
+                        destination_country_iso3: 'us',
+                    });
+
+                    strictEqual(payload.length, 1);
+                    strictEqual(payload[0].tracking_number, "H1000730000834301047");
+                    strictEqual(payload[0].courier, "hermes");
+                });
+
             });
         });
 
     }
 }
 
-const test = new ParcelLabApiTest(user, token);
+const test = new ParcelLabApiTest();
 test.run();

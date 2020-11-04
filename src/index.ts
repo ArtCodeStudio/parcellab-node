@@ -113,6 +113,8 @@ export class ParcelLabApi {
     return results;
   }
 
+  protected tackingNumberIs
+
   /**
    * Creates or updates a new order on the parcelLab API
    *
@@ -283,7 +285,7 @@ export class ParcelLabApi {
           tracking_number,
         });
       }
-    } else if (terminator.length == 1) {
+    } else if (terminator.length === 1) {
       const tnos_raw = (payload.tracking_number as string).split(terminator);
       for (let j = 0; j < tnos_raw.length; j++) {
         const courier = payload.courier;
@@ -319,7 +321,7 @@ export class ParcelLabApi {
 
         // Special case for Colis Prive, remove zip from the end of the tracking code
         if (newPayload.courier === "colisprivee" && payload.zip_code) {
-          newPayload.tracking_number = this.removeFromEnd(newPayload.tracking_number, payload.zip_code)
+          newPayload.tracking_number = utils.removeFromEnd(newPayload.tracking_number, payload.zip_code)
         }
       }
 
@@ -327,22 +329,6 @@ export class ParcelLabApi {
     }
 
     return payloads;
-  }
-
-  protected handleCourierName(courier?: string) {
-    if (courier) {
-      return courier.trim().toLowerCase().replace(/\s/g,"-");
-    }
-    return courier;
-  }
-
-  /**
-   * Removes a substring from a string if the string ends with the substring
-   * @param str String to remove the substring from the end
-   * @param test The substring to remove from the string
-   */
-  protected removeFromEnd(str: string, test: string) {
-    return str.replace(new RegExp(test + '$'), '');
   }
   
   /**
@@ -355,15 +341,17 @@ export class ParcelLabApi {
     if (!courier) {
       return courier;
     }
-    courier = this.handleCourierName(courier);
+    courier = utils.handle(courier);
 
-    if (params.couriersAppendCountry.includes(courier) && payload.destination_country_iso3) {
-      payload.destination_country_iso3 = payload.destination_country_iso3.toLowerCase();
-      const newOutput = `${courier}-${payload.destination_country_iso3}`;
+    let localeCode = payload.destination_country_iso3 || payload.language_iso3;
 
-      // Only append payload.destination_country_iso3 if the resulting courier is known
+    if (params.couriersAppendCountry.includes(courier) && localeCode) {
+      localeCode = localeCode.toLowerCase();
+      const newOutput = `${courier}-${localeCode}`;
+
+      // Only append localeCode if the resulting courier is known
       if(params.couriers[newOutput]) {
-        this.log.warn(`Append country code "${payload.destination_country_iso3}" to courier ${courier}, please check if this is the correct courier code "${newOutput}", if not append the country code by your self before you send them to parcellab.`);
+        this.log.warn(`Append country code "${localeCode}" to courier "${courier}": "${newOutput}", please check if this is the correct courier code ${payload.tracking_number ? `for tracking number "${payload.tracking_number}"` : ''}, if not append the country code by your self before you send them to parcellab.`);
         courier = newOutput;
       }
       
@@ -376,7 +364,7 @@ export class ParcelLabApi {
       this.log.warn('Unknown courier: ' + courier);
     }
 
-    courier = this.handleCourierName(courier);
+    courier = utils.handle(courier);
 
     return courier;
   }
