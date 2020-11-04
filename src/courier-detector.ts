@@ -104,8 +104,8 @@ export class CourierDetector {
         /**
          * Starts with H and ends with 19 numeric digits (H1000730000834301047)
          */
-        hermes: {
-            code: 'hermes',
+        'hermes-de': {
+            code: 'hermes-de',
             patterns: [new RegExp('^H[0-9]{19}$')],
             tracking_url: (trackNum: string) => `https://www.myhermes.de/empfangen/sendungsverfolgung/sendungsinformation/#${trackNum}`
         },
