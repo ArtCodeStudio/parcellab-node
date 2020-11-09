@@ -172,7 +172,7 @@ export class ParcelLabApi {
     let invalidKeys: string[] = [];
 
     const keyChecker1 = utils.objHasKeys(payload, requiredKeys);
-    if (!keyChecker1.missing) {
+    if (keyChecker1.missing.length > 0) {
       invalidKeys = [...invalidKeys, ...keyChecker1.missing];
       isValid = false;
       error = 'Required keys missing: ' + keyChecker1.missing.join(', ');
