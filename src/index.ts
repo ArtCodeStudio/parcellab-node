@@ -308,15 +308,15 @@ export class ParcelLabApi {
           const detectedCouriers = this.detector.getCouriers(newPayload.tracking_number);
 
           if (detectedCouriers.length <= 0) {
-            this.log.warn(`Can't validate courier "${newPayload.courier}" for for tracking number "${newPayload.tracking_number}", please create pull request or issue on https://github.com/ArtCodeStudio/parcellab-node to add support for this courier in pacellab-node or ignore this message if everything works for you.`);
+            this.log.warn(`[${newPayload.client}] Can't validate courier "${newPayload.courier}" for tracking number "${newPayload.tracking_number}" and order number "${newPayload.orderNo}", please create pull request or issue on https://github.com/ArtCodeStudio/parcellab-node to add support for this courier in pacellab-node or ignore this message if everything works for you.`);
           } else {
             const index = detectedCouriers.indexOf(newPayload.courier);
             if (index === -1) {
               const detectedCourier = detectedCouriers[0];
-              this.log.warn(`Wrong courier code "${newPayload.courier}" for tracking number "${newPayload.tracking_number}" detected, courier code corrected to "${detectedCourier}. If this is the wrong courier, disable the automatic detection, create a pull request or issue to correct this on https://github.com/ArtCodeStudio/parcellab-node`);
+              this.log.warn(`[${newPayload.client}] Wrong courier code "${newPayload.courier}" for tracking number "${newPayload.tracking_number}" and order number "${newPayload.orderNo}" detected, courier code corrected to "${detectedCourier}. If this is the wrong courier, disable the automatic detection, create a pull request or issue to correct this on https://github.com/ArtCodeStudio/parcellab-node`);
               newPayload.courier = detectedCourier;
             } else {
-              this.log.info(`Courier code "${newPayload.courier}" is valid`);
+              this.log.info(`[${newPayload.client}] Courier code "${newPayload.courier}" is valid`);
             }
           }
         }

@@ -90,6 +90,13 @@ describe('CourierDetector', () => {
       const courier = detector.getCourier("9L27236131798");
       strictEqual(courier, "wn-direct");
     });
+
+    it('"1Z0370A00401261779" should be detected as "wn-direct"', () => {
+      const courier = detector.getCourier("1Z0370A00401261779");
+      strictEqual(courier, "wn-direct");
+    });
+
+     
      
   });
 
