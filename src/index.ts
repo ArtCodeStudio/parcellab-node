@@ -1,24 +1,36 @@
-export * from './interfaces'
+export * from './interfaces';
 export * from './params';
 export * from './utils';
 
 import params from './params';
 import * as utils from './utils';
 import { CourierDetector } from './courier-detector';
-import { ParcellabTracking, ParcellabOrder, ParcellabSearchResponse, PayloadError, LogLevel } from './interfaces'
+import {
+  ParcellabTracking,
+  ParcellabOrder,
+  ParcellabSearchResponse,
+  PayloadError,
+  LogLevel,
+} from './interfaces';
 
 // modules
 import got from 'got';
-import { Agent } from "https";
+import { Agent } from 'https';
 import ø from 'validator';
-import { isUndefined, isNull, isObject, isString, extend, keys } from 'underscore';
+import {
+  isUndefined,
+  isNull,
+  isObject,
+  isString,
+  extend,
+  keys,
+} from 'underscore';
 import { stringify as QueryString } from 'querystring';
 
 /**
  * Based on https://bitbucket.org/parcellab/sdk-node/src/master/index.js
  */
 export class ParcelLabApi {
-
   public detector = new CourierDetector();
 
   protected log = {
@@ -34,7 +46,7 @@ export class ParcelLabApi {
     error(...data: any[]): void {
       // Ignore
     },
-  }
+  };
 
   /**
    * @param user parcellab user
@@ -42,8 +54,12 @@ export class ParcelLabApi {
    * @param autoDetectCourier disable / enable autodetection of courier by tracking number. Enabled by default
    * @param logLevel log level, info, warn and error enabled by default
    */
-  constructor(protected user: number, protected token: string, protected autoDetectCourier = true, protected logLevel: LogLevel = LogLevel.Info) {
-
+  constructor(
+    protected user: number,
+    protected token: string,
+    protected autoDetectCourier = true,
+    protected logLevel: LogLevel = LogLevel.Info,
+  ) {
     // Validate user and token
     if (!ø.isInt(user.toString()) || token.length < 30) {
       throw new Error('Invalid user/ token combination');
@@ -72,14 +88,12 @@ export class ParcelLabApi {
     if (this.logLevel >= LogLevel.Error) {
       this.log.error = console.error;
     }
-    
+
     this.user = user;
     this.token = token;
     this.autoDetectCourier = autoDetectCourier;
     this.logLevel = logLevel;
   }
-
-
 
   //////////////////////
   // Public Functions //
@@ -91,9 +105,15 @@ export class ParcelLabApi {
    * @param payload Specifies the tracking to be created
    * @param test For testing only, if true this creates a tracking mock
    */
-  public async createOrUpdateTracking(payload: ParcellabTracking, test: boolean = false): Promise<string[]> {
+  public async createOrUpdateTracking(
+    payload: ParcellabTracking,
+    test = false,
+  ): Promise<string[]> {
     payload = utils.deleteEmptyValues(payload);
-    const { error, isValid, invalidKeys} = this.checkPayload(payload, 'tracking');
+    const { error, isValid, invalidKeys } = this.checkPayload(
+      payload,
+      'tracking',
+    );
 
     if (!isValid) {
       this.log.error('invalidKeys: ' + invalidKeys);
@@ -106,14 +126,19 @@ export class ParcelLabApi {
     const results: string[] = [];
 
     for (const payload of payloads) {
-      const result = await this.postTrackingToParcelLabAPI(payload, this.user, this.token, test)
+      const result = await this.postTrackingToParcelLabAPI(
+        payload,
+        this.user,
+        this.token,
+        test,
+      );
       results.push(result);
     }
 
     return results;
   }
 
-  protected tackingNumberIs
+  protected tackingNumberIs;
 
   /**
    * Creates or updates a new order on the parcelLab API
@@ -124,9 +149,12 @@ export class ParcelLabApi {
    * @param payload Specifies the order to be created
    * @param test For testing only, if true this creates a tracking mock
    */
-  public async createOrUpdateOrder(payload: ParcellabOrder, test: boolean = false): Promise<string[]> {
+  public async createOrUpdateOrder(
+    payload: ParcellabOrder,
+    test = false,
+  ): Promise<string[]> {
     payload = utils.deleteEmptyValues(payload);
-    const { error, isValid} = this.checkPayload(payload, 'order');
+    const { error, isValid } = this.checkPayload(payload, 'order');
 
     if (!isValid) {
       throw new Error(error);
@@ -136,7 +164,12 @@ export class ParcelLabApi {
     const results: string[] = [];
 
     for (const payload of payloads) {
-      const result = await this.postOrderToParcelLabAPI(payload, this.user, this.token, test);
+      const result = await this.postOrderToParcelLabAPI(
+        payload,
+        this.user,
+        this.token,
+        test,
+      );
       results.push(result);
     }
 
@@ -150,10 +183,20 @@ export class ParcelLabApi {
    * @param page What page to show (pagination), defaults to 0
    * @param size Number of entries on a page, defaults to 24
    */
-  public async search(search?: string, page?: number, size?: number): Promise<ParcellabSearchResponse> {
+  public async search(
+    search?: string,
+    page?: number,
+    size?: number,
+  ): Promise<ParcellabSearchResponse> {
     const url = params.endpoint + 'v2/search/';
     const query = utils.deleteEmptyValues({ s: search, p: page, pSize: size });
-    return this.get(url, query, this.user, this.token, 'json') as Promise<ParcellabSearchResponse>;
+    return this.get(
+      url,
+      query,
+      this.user,
+      this.token,
+      'json',
+    ) as Promise<ParcellabSearchResponse>;
   }
 
   //////////////////////////
@@ -164,7 +207,10 @@ export class ParcelLabApi {
    * Checks whether a payload is valid
    * @param payload Payload to be transmitted to parcelLab API
    */
-  protected checkPayload(payload: ParcellabOrder | ParcellabTracking, endpoint: 'tracking' | 'order'): { error: string | null, isValid?: boolean, invalidKeys: string[] } {
+  protected checkPayload(
+    payload: ParcellabOrder | ParcellabTracking,
+    endpoint: 'tracking' | 'order',
+  ): { error: string | null; isValid?: boolean; invalidKeys: string[] } {
     const requiredKeys = params[endpoint].requiredKeys;
     const allowedKeys = requiredKeys.concat(params.allowedKeys);
     let isValid = true;
@@ -178,7 +224,7 @@ export class ParcelLabApi {
       error = 'Required keys missing: ' + keyChecker1.missing.join(', ');
       return { error, isValid, invalidKeys };
     }
-  
+
     const keyChecker2 = utils.objHasOnlyKeys(payload, allowedKeys);
     if (!keyChecker2.allAllowed) {
       invalidKeys = [...invalidKeys, ...keyChecker2.unallowed];
@@ -190,7 +236,10 @@ export class ParcelLabApi {
     const datachecks = params.datachecks;
 
     for (let i = 0; i < datachecks.email.length; i++) {
-      if (!isNull(payload[datachecks.email[i]]) && !isUndefined(payload[datachecks.email[i]])) {
+      if (
+        !isNull(payload[datachecks.email[i]]) &&
+        !isUndefined(payload[datachecks.email[i]])
+      ) {
         const isCurValid = ø.isEmail(payload[datachecks.email[i]]);
         if (!isCurValid) {
           invalidKeys.push(datachecks.email[i]);
@@ -201,7 +250,10 @@ export class ParcelLabApi {
     }
 
     for (let j = 0; j < datachecks.number.length; j++) {
-      if (!isNull(payload[datachecks.number[j]]) && !isUndefined(payload[datachecks.number[j]])) {
+      if (
+        !isNull(payload[datachecks.number[j]]) &&
+        !isUndefined(payload[datachecks.number[j]])
+      ) {
         const isCurValid = typeof payload[datachecks.number[j]] === 'number';
         if (!isCurValid) {
           invalidKeys.push(datachecks.number[j]);
@@ -212,8 +264,11 @@ export class ParcelLabApi {
     }
 
     for (let k = 0; k < datachecks.boolean.length; k++) {
-      if (!isNull(payload[datachecks.boolean[k]]) && !isUndefined(payload[datachecks.boolean[k]])) {
-        const isCurValid = (typeof payload[datachecks.boolean[k]] === 'boolean');
+      if (
+        !isNull(payload[datachecks.boolean[k]]) &&
+        !isUndefined(payload[datachecks.boolean[k]])
+      ) {
+        const isCurValid = typeof payload[datachecks.boolean[k]] === 'boolean';
         if (!isCurValid) {
           invalidKeys.push(datachecks.number[k]);
           error = 'Field to be required to be a bool is not a bool';
@@ -224,13 +279,15 @@ export class ParcelLabApi {
 
     return { error, isValid, invalidKeys };
   }
-  
+
   /**
    * Checks whether the payload has multiple tracking numbers in its key
    * @param payload payload to be checked for multieple tracking numbers
    * @return String for termination of tracking number sequence or null if no multiples
    */
-  protected hasMultipleTrackingNumbers(payload: ParcellabOrder | ParcellabTracking): string {
+  protected hasMultipleTrackingNumbers(
+    payload: ParcellabOrder | ParcellabTracking,
+  ): string {
     if (isNull(payload.tracking_number)) return null;
     if (isObject(payload.tracking_number)) return 'json';
     if (Array.isArray(payload.tracking_number)) {
@@ -239,19 +296,22 @@ export class ParcelLabApi {
     if (isString(payload.tracking_number)) {
       const terminators = ['|', ','];
       for (let i = 0; i < terminators.length; i++) {
-        if (payload.tracking_number.indexOf(terminators[i]) > -1) return terminators[i];
+        if (payload.tracking_number.indexOf(terminators[i]) > -1)
+          return terminators[i];
       }
     }
     return null;
   }
-  
+
   /**
    * Creates an array of payloads out of a single payload with multiples in the tracking_number
    * @param payload Payload to be multiplied, with a tracking_number like so:
    *                          {ups:["1Z74845R6842887612","1Z74845R6842758029"]}
    * @return Array of payloads with single tracking numbers
    */
-  protected multiplyOnTrackingNumber(payload: ParcellabOrder | ParcellabTracking): (ParcellabOrder | ParcellabTracking)[] {
+  protected multiplyOnTrackingNumber(
+    payload: ParcellabOrder | ParcellabTracking,
+  ): (ParcellabOrder | ParcellabTracking)[] {
     const tnos = [];
     const payloads = []; // array of new payloads
     const terminator = this.hasMultipleTrackingNumbers(payload);
@@ -261,20 +321,20 @@ export class ParcelLabApi {
       const tracking_number = payload.tracking_number;
       tnos.push({
         courier,
-        tracking_number
+        tracking_number,
       });
     } else if (terminator === 'json') {
       const json = payload.tracking_number;
       const jsonCouriers = keys(json);
       for (let k = 0; k < jsonCouriers.length; k++) {
-          const courier = jsonCouriers[k];
-          const jsonTnos = json[jsonCouriers[k]];
-          for (let l = 0; l < jsonTnos.length; l++) {
-              tnos.push({
-                  courier,
-                  tracking_number: jsonTnos[l]
-              });
-          }
+        const courier = jsonCouriers[k];
+        const jsonTnos = json[jsonCouriers[k]];
+        for (let l = 0; l < jsonTnos.length; l++) {
+          tnos.push({
+            courier,
+            tracking_number: jsonTnos[l],
+          });
+        }
       }
     } else if (terminator === 'array') {
       const tracking_numbers = payload.tracking_number as string[];
@@ -298,32 +358,44 @@ export class ParcelLabApi {
     }
 
     for (let i = 0; i < tnos.length; i++) {
-      const newPayload = extend({}, payload) as ParcellabOrder | ParcellabTracking;
+      const newPayload = extend({}, payload) as
+        | ParcellabOrder
+        | ParcellabTracking;
       newPayload.courier = this.guessCourier(tnos[i].courier, payload);
       newPayload.tracking_number = tnos[i].tracking_number;
 
       if (typeof newPayload.tracking_number === 'string') {
-
         if (this.autoDetectCourier) {
-          const detectedCouriers = this.detector.getCouriers(newPayload.tracking_number);
+          const detectedCouriers = this.detector.getCouriers(
+            newPayload.tracking_number,
+          );
 
           if (detectedCouriers.length <= 0) {
-            this.log.warn(`[${newPayload.client}] Can't validate courier "${newPayload.courier}" for tracking number "${newPayload.tracking_number}" and order number "${newPayload.orderNo}", please create pull request or issue on https://github.com/ArtCodeStudio/parcellab-node to add support for this courier in pacellab-node or ignore this message if everything works for you.`);
+            this.log.warn(
+              `[${newPayload.client}] Can't validate courier "${newPayload.courier}" for tracking number "${newPayload.tracking_number}" and order number "${newPayload.orderNo}", please create pull request or issue on https://github.com/ArtCodeStudio/parcellab-node to add support for this courier in pacellab-node or ignore this message if everything works for you.`,
+            );
           } else {
             const index = detectedCouriers.indexOf(newPayload.courier);
             if (index === -1) {
               const detectedCourier = detectedCouriers[0];
-              this.log.warn(`[${newPayload.client}] Wrong courier code "${newPayload.courier}" for tracking number "${newPayload.tracking_number}" and order number "${newPayload.orderNo}" detected, courier code corrected to "${detectedCourier}. If this is the wrong courier, disable the automatic detection, create a pull request or issue to correct this on https://github.com/ArtCodeStudio/parcellab-node`);
+              this.log.warn(
+                `[${newPayload.client}] Wrong courier code "${newPayload.courier}" for tracking number "${newPayload.tracking_number}" and order number "${newPayload.orderNo}" detected, courier code corrected to "${detectedCourier}. If this is the wrong courier, disable the automatic detection, create a pull request or issue to correct this on https://github.com/ArtCodeStudio/parcellab-node`,
+              );
               newPayload.courier = detectedCourier;
             } else {
-              this.log.info(`[${newPayload.client}] Courier code "${newPayload.courier}" is valid`);
+              this.log.info(
+                `[${newPayload.client}] Courier code "${newPayload.courier}" is valid`,
+              );
             }
           }
         }
 
         // Special case for Colis Prive, remove zip from the end of the tracking code
-        if (newPayload.courier === "colisprivee" && payload.zip_code) {
-          newPayload.tracking_number = utils.removeFromEnd(newPayload.tracking_number, payload.zip_code)
+        if (newPayload.courier === 'colisprivee' && payload.zip_code) {
+          newPayload.tracking_number = utils.removeFromEnd(
+            newPayload.tracking_number,
+            payload.zip_code,
+          );
         }
       }
 
@@ -332,14 +404,17 @@ export class ParcelLabApi {
 
     return payloads;
   }
-  
+
   /**
    * Retrieves courier code from mappings for given courier name if available
    * @param input Name of courier as given by input
    * @param destinationCountryIso3
    * @return Mapping to actual courier code
    */
-  protected guessCourier(courier: string, payload: ParcellabOrder | ParcellabTracking): string | undefined {
+  protected guessCourier(
+    courier: string,
+    payload: ParcellabOrder | ParcellabTracking,
+  ): string | undefined {
     if (!courier) {
       return courier;
     }
@@ -352,11 +427,16 @@ export class ParcelLabApi {
       const newOutput = `${courier}-${localeCode}`;
 
       // Only append localeCode if the resulting courier is known
-      if(params.couriers[newOutput]) {
-        this.log.warn(`Append country code "${localeCode}" to courier "${courier}": "${newOutput}", please check if this is the correct courier code ${payload.tracking_number ? `for tracking number "${payload.tracking_number}"` : ''}, if not append the country code by your self before you send them to parcellab.`);
+      if (params.couriers[newOutput]) {
+        this.log.warn(
+          `Append country code "${localeCode}" to courier "${courier}": "${newOutput}", please check if this is the correct courier code ${
+            payload.tracking_number
+              ? `for tracking number "${payload.tracking_number}"`
+              : ''
+          }, if not append the country code by your self before you send them to parcellab.`,
+        );
         courier = newOutput;
       }
-      
     }
 
     const knownInputs = keys(params.couriers);
@@ -370,23 +450,28 @@ export class ParcelLabApi {
 
     return courier;
   }
-  
+
   ////////////////
   // API Access //
   ////////////////
-  
+
   /**
    * Posts a new tracking to the parcelLab API to be tracked
    * @see https://how.parcellab.works/docs/integration-quick-start/creating-a-new-tracking/api
-   * 
+   *
    * @param payload Payload to be transmitted to parcelLab API
    * @param user
    * @param token
    * @param test For testing only, if true this creates a tracking mock
    */
-  protected async postTrackingToParcelLabAPI(payload: ParcellabOrder | ParcellabTracking, user: number, token: string, test: boolean) {
+  protected async postTrackingToParcelLabAPI(
+    payload: ParcellabOrder | ParcellabTracking,
+    user: number,
+    token: string,
+    test: boolean,
+  ) {
     this.log.debug('postTrackingToParcelLabAPI', payload);
-    
+
     let url: string;
     if (test) {
       url = params.mockEndpoint + 'track/';
@@ -398,7 +483,7 @@ export class ParcelLabApi {
 
     if (test) {
       const mock = await this.validateMostRecentTracking(this.user, this.token);
-      this.log.debug("postTrackingToParcelLabAPI mock", mock);
+      this.log.debug('postTrackingToParcelLabAPI mock', mock);
     }
 
     return res;
@@ -407,15 +492,20 @@ export class ParcelLabApi {
   /**
    * Posts a new tracking to the parcelLab API to be tracked
    * @see https://how.parcellab.works/docs/integration-quick-start/creating-a-new-order/api
-   * 
+   *
    * @param payload Payload to be transmitted to parcelLab API
    * @param user
    * @param token
    * @param test For testing only, if true this creates a tracking mock
    */
-  protected async postOrderToParcelLabAPI(payload: ParcellabOrder | ParcellabTracking, user: number, token: string, test: boolean) {
+  protected async postOrderToParcelLabAPI(
+    payload: ParcellabOrder | ParcellabTracking,
+    user: number,
+    token: string,
+    test: boolean,
+  ) {
     this.log.debug('postOrderToParcelLabAPI', payload);
-    
+
     let url: string;
     if (test) {
       url = params.mockEndpoint + 'presage/';
@@ -431,7 +521,7 @@ export class ParcelLabApi {
    */
   protected async validateMostRecentTracking(user: number, token: string) {
     const url = params.mockEndpoint + 'track/';
-    return this.get(url, { user, token}, user, token);
+    return this.get(url, { user, token }, user, token);
   }
 
   /**
@@ -442,7 +532,13 @@ export class ParcelLabApi {
    * @param token parcelLab token
    * @param responseType The response type, by default 'text'
    */
-  protected async post(url: string, data: any, user: number, token: string, responseType = 'text'): Promise<any> {
+  protected async post(
+    url: string,
+    data: any,
+    user: number,
+    token: string,
+    responseType = 'text',
+  ): Promise<any> {
     return this.request('post', url, data, user, token, responseType);
   }
 
@@ -454,47 +550,60 @@ export class ParcelLabApi {
    * @param token parcelLab token
    * @param responseType The response type, by default 'text'
    */
-  protected async get(url: string, params: any, user: number, token: string, responseType = 'text'): Promise<any> {
+  protected async get(
+    url: string,
+    params: any,
+    user: number,
+    token: string,
+    responseType = 'text',
+  ): Promise<any> {
     return this.request('get', url, params, user, token, responseType);
   }
 
   /**
    * Make a http request
-   * @param url 
-   * @param params 
-   * @param user 
-   * @param token 
-   * @param responseType 
+   * @param url
+   * @param params
+   * @param user
+   * @param token
+   * @param responseType
    */
-  protected async request(method: 'post' | 'get', url: string, data: any = {}, user: number, token: string, responseType = 'text'): Promise<string> {
+  protected async request(
+    method: 'post' | 'get',
+    url: string,
+    data: any = {},
+    user: number,
+    token: string,
+    responseType = 'text',
+  ): Promise<string> {
     // prepare request
     const httpsAgent = new Agent({
-      rejectUnauthorized: false
+      rejectUnauthorized: false,
     });
 
     // GET request can't have a body, so we convert the data to a query string
     if (method === 'get') {
       const queryStr = QueryString(data);
-      url = url + (queryStr && queryStr.length > 0 ? "?" + queryStr : "");
+      url = url + (queryStr && queryStr.length > 0 ? '?' + queryStr : '');
     }
 
     this.log.debug('request url ' + method, url);
 
     const gotOptions = {
       agent: {
-        https: httpsAgent
+        https: httpsAgent,
       },
       https: {
-        rejectUnauthorized: false
+        rejectUnauthorized: false,
       },
       json: method === 'post' ? data : undefined,
       responseType,
       headers: {
         // 'Content-Type': 'application/json',
-        'user': user.toString(),
-        'token': token.toString()
+        user: user.toString(),
+        token: token.toString(),
       },
-      retry: 3
+      retry: 3,
     };
 
     const res = await got[method](url, gotOptions as any);

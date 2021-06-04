@@ -14,10 +14,12 @@ import { keys, contains } from 'underscore';
  * @param arrayOfKeys Keys to be checked for existence
  * @return true if object has all the keys of the array
  */
-export const objHasKeys = (obj: any, arrayOfKeys: string[]): {hasAllKeys: boolean, missing: string[]} => {
-
+export const objHasKeys = (
+  obj: any,
+  arrayOfKeys: string[],
+): { hasAllKeys: boolean; missing: string[] } => {
   let hasAllKeys = true;
-  let missing: string[] = [];
+  const missing: string[] = [];
 
   for (let i = 0; i < arrayOfKeys.length; i++) {
     if (!obj.hasOwnProperty(arrayOfKeys[i])) {
@@ -28,7 +30,7 @@ export const objHasKeys = (obj: any, arrayOfKeys: string[]): {hasAllKeys: boolea
 
   return {
     hasAllKeys,
-    missing
+    missing,
   };
 };
 
@@ -39,7 +41,6 @@ export const objHasKeys = (obj: any, arrayOfKeys: string[]): {hasAllKeys: boolea
  * @return true if object has only keys contained in the array
  */
 export const objHasOnlyKeys = (obj: any, arrayOfKeys: string[]) => {
-
   let allAllowed = true;
   const unallowed = [];
 
@@ -52,28 +53,28 @@ export const objHasOnlyKeys = (obj: any, arrayOfKeys: string[]) => {
   }
 
   return {
-    allAllowed, unallowed
+    allAllowed,
+    unallowed,
   };
-
 };
 
 export const deleteEmptyValues = (data: any) => {
   for (const key in data) {
-    if(typeof(data[key]) === 'undefined') {
+    if (typeof data[key] === 'undefined') {
       delete data[key];
     }
-    if(typeof(data[key]) === 'string' && data[key].length <= 0) {
+    if (typeof data[key] === 'string' && data[key].length <= 0) {
       delete data[key];
     }
-    if(data[key] === null) {
+    if (data[key] === null) {
       delete data[key];
     }
-    if(typeof(data[key]) === 'object') {
+    if (typeof data[key] === 'object') {
       data[key] = deleteEmptyValues(data[key]);
     }
   }
   return data;
-}
+};
 
 /**
  * Removes a substring from a string if the string ends with the substring
@@ -82,15 +83,15 @@ export const deleteEmptyValues = (data: any) => {
  */
 export const removeFromEnd = (str: string, test: string) => {
   return str.replace(new RegExp(test + '$'), '');
-}
+};
 
 /**
  * Handle string, converts a string "Abc def" to "avc-def"
- * @param str 
+ * @param str
  */
 export const handle = (str?: string) => {
   if (str) {
-    return str.trim().toLowerCase().replace(/\s/g,"-");
+    return str.trim().toLowerCase().replace(/\s/g, '-');
   }
   return str;
-}
+};
