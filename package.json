@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "mocha",
-    "build": "npm run clear && tsc",
+    "build": "yarn run clear && tsc",
     "clear": "rm dist/* -rf"
   },
   "repository": {
