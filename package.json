@@ -36,17 +36,18 @@
     "dist/"
   ],
   "dependencies": {
-    "got": "^11.8.0",
-    "underscore": "^1.11.0",
-    "validator": "^13.1.17"
+    "got": "^11.8.2",
+    "underscore": "^1.13.1",
+    "validator": "^13.6.0"
   },
   "devDependencies": {
-    "@types/mocha": "^8.0.3",
-    "@types/underscore": "^1.10.24",
-    "@types/validator": "^13.1.0",
+    "@types/mocha": "^8.2.2",
+    "@types/node": "^15.12.0",
+    "@types/underscore": "^1.11.2",
+    "@types/validator": "^13.1.3",
     "assert": "^2.0.0",
-    "mocha": "^8.2.1",
-    "ts-node": "^9.0.0",
-    "typescript": "^4.0.5"
+    "mocha": "^8.4.0",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.2"
   }
 }
