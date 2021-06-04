@@ -1,6 +1,11 @@
 dist/
 node_modules/
-.yarn/
-.yarnrc.yml
-.pnp.js
+# Yarn see https://next.yarnpkg.com/advanced/qa#which-files-should-be-gitignored
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+# Ignore yarn.lock is not recommended, but be do this to be able to add this project as a yarn 2 submodule to other repositories
 yarn.lock
