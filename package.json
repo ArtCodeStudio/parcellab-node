@@ -36,6 +36,7 @@
     "dist/"
   ],
   "dependencies": {
+    "@yarnpkg/pnpify": "^3.0.0-rc.6",
     "got": "^11.8.2",
     "underscore": "^1.13.1",
     "validator": "^13.6.0"
