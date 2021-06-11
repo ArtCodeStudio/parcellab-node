@@ -150,7 +150,7 @@ export class ParcelLabApi {
    * @param test For testing only, if true this creates a tracking mock
    */
   public async createOrUpdateOrder(
-    payload: ParcellabOrder,
+    payload: ParcellabOrder | ParcellabTracking,
     test = false,
   ): Promise<string[]> {
     payload = utils.deleteEmptyValues(payload);
