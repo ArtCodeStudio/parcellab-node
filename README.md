@@ -49,7 +49,7 @@ const payloadTracking = {
 };
 
 try {
-  const result = await parcellab.createOrUpdateTracking(payloadTracking);
+  const result = await parcellab.createTracking(payloadTracking);
   console.log(result);
 } catch (error) {
   console.error("Error on transfer tracking", error);
@@ -61,7 +61,7 @@ For required and optional properies see the [interfaces](https://github.com/ArtC
 
 ## Dealing with multiple tracking numbers
 
-The module features dealing with multiple tracking numbers embedded in the payload. This allows to use one single call of `createOrUpdateTracking(payload)` for creating multiple trackings for a single order, e.g. when an order from a customer is shipped in several deliveries.
+The module features dealing with multiple tracking numbers embedded in the payload. This allows to use one single call of `createTracking(payload)` for creating multiple trackings for a single order, e.g. when an order from a customer is shipped in several deliveries.
 
 ### Multiple deliveries with same courier
 
