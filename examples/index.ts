@@ -97,22 +97,22 @@ const payloadOrderExample1: ParcellabOrder = {
 const start = async () => {
     const pl = new ParcelLabApi(user, token);
 
-    // Use createOrUpdateTracking if you have a tracking number an a courier from the beginning
+    // Use createTracking if you have a tracking number an a courier from the beginning
     try {
-        const result1 = await pl.createOrUpdateTracking(payloadTrackingExample1);
+        const result1 = await pl.createTracking(payloadTrackingExample1);
         console.log(result1);
-        const result2 = await pl.createOrUpdateTracking(payloadTrackingExample2);
+        const result2 = await pl.createTracking(payloadTrackingExample2);
         console.log(result2);
-        const result3 = await pl.createOrUpdateTracking(payloadTrackingExample3);
+        const result3 = await pl.createTracking(payloadTrackingExample3);
         console.log(result3);
-        const result4 = await pl.createOrUpdateTracking(payloadTrackingExample4);
+        const result4 = await pl.createTracking(payloadTrackingExample4);
         console.log(result4);
     } catch (error) {
         console.error("Error on transfer tracking", error);
     }
 
     // Use createOrUpdateOrder if you want to transfer the tracking number or courier later,
-    // as soon as you have the tracking number you must use the same method and not createOrUpdateTracking
+    // as soon as you have the tracking number you must use the same method and not createTracking
     try {
         const result1 = await pl.createOrUpdateOrder(payloadOrderExample1);
         console.log(result1);
