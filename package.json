@@ -46,7 +46,7 @@
     "@types/got": "^9.6.12",
     "@types/jest": "^27.0.3",
     "@types/mocha": "^9.0.0",
-    "@types/node": "^16.11.9",
+    "@types/node": "^16.11.10",
     "@types/underscore": "^1.11.3",
     "@types/validator": "^13.7.0",
     "assert": "^2.0.0",
