@@ -4,7 +4,7 @@ This is a simple unofficial wrapper to interface the parcelLab API to [Node.js](
 
 ## Shopify
 
-If you need the parcelLab API for a Shopify store we already have a ready to use integration for you, we can also adapt the integration to your needs, just contact us at hi@artandcode.studio.
+If you need the parcelLab API for a Shopify store we [already have a ready to use integration for you](https://github.com/ArtCodeStudio/parcel-lab-shopify-app), we can also adapt the integration to your needs, just contact us at hi@artandcode.studio.
 
 ## Background
 
