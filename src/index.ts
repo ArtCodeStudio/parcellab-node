@@ -9,6 +9,8 @@ import {
   ParcellabTracking,
   ParcellabOrder,
   ParcellabSearchResponse,
+  ParcellabTrackingDetailsResponse,
+  ParcellabTrackingNumberByCurriers,
   PayloadError,
   LogLevel,
 } from './interfaces';
@@ -125,7 +127,7 @@ export class ParcelLabApi {
     const payloads = this.multiplyOnTrackingNumber(payload);
     const results: string[] = [];
 
-    for (const payload of payloads) {
+    for await (const payload of payloads) {
       const result = await this.postTrackingToParcelLabAPI(
         payload,
         this.user,
@@ -137,8 +139,6 @@ export class ParcelLabApi {
 
     return results;
   }
-
-  protected tackingNumberIs;
 
   /**
    * Creates or updates a new order on the parcelLab API
@@ -197,6 +197,44 @@ export class ParcelLabApi {
       this.token,
       'json',
     ) as Promise<ParcellabSearchResponse>;
+  }
+
+  /**
+   * Retrieves the detailed information for a single tracking.
+   * @see https://extended.parcellab.com/#7a9712c2-3d16-489d-3244-453275505b69
+   * @param payload
+   * @returns
+   */
+  public async getTracking(payload: {
+    tracking_number: string | string[] | ParcellabTrackingNumberByCurriers;
+    courier?: string;
+  }): Promise<ParcellabTrackingDetailsResponse> {
+    const url = params.endpoint + 'v2/tracking-details/';
+
+    const payloads = this.multiplyOnTrackingNumber(
+      payload,
+    ) as Partial<ParcellabTracking>[];
+
+    const results: ParcellabTrackingDetailsResponse = [];
+    for await (const payload of payloads) {
+      if (!payload.courier || !payload.tracking_number) {
+        this.log.warn('courier and tracking_number are required!');
+        continue;
+      }
+      const query = utils.deleteEmptyValues({
+        courier: payload.courier,
+        tno: payload.tracking_number,
+      });
+      const result = (await this.get(
+        url,
+        query,
+        this.user,
+        this.token,
+        'json',
+      )) as Promise<ParcellabTrackingDetailsResponse>;
+      results.push(result);
+    }
+    return results;
   }
 
   //////////////////////////
@@ -286,7 +324,7 @@ export class ParcelLabApi {
    * @return String for termination of tracking number sequence or null if no multiples
    */
   protected hasMultipleTrackingNumbers(
-    payload: ParcellabOrder | ParcellabTracking,
+    payload: Partial<ParcellabOrder> | Partial<ParcellabTracking>,
   ): string {
     if (isNull(payload.tracking_number)) return null;
     if (isObject(payload.tracking_number)) return 'json';
@@ -310,7 +348,7 @@ export class ParcelLabApi {
    * @return Array of payloads with single tracking numbers
    */
   protected multiplyOnTrackingNumber(
-    payload: ParcellabOrder | ParcellabTracking,
+    payload: Partial<ParcellabOrder> | Partial<ParcellabTracking>,
   ): (ParcellabOrder | ParcellabTracking)[] {
     const tnos = [];
     const payloads = []; // array of new payloads
@@ -413,7 +451,7 @@ export class ParcelLabApi {
    */
   protected guessCourier(
     courier: string,
-    payload: ParcellabOrder | ParcellabTracking,
+    payload: Partial<ParcellabOrder> | Partial<ParcellabTracking>,
   ): string | undefined {
     if (!courier) {
       return courier;
