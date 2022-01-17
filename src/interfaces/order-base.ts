@@ -7,12 +7,8 @@ import { ParcellabTrackingBase } from './tracking-base';
  * @see https://how.parcellab.works/docs/integration-quick-start/data-model#creating-orders
  */
 export interface ParcellabOrderBase extends Partial<ParcellabTrackingBase> {
-    /**
-     * id-of-delivery-before-tracking-numbe
-     */
-    xid?: string;
-    /**
-     * Order number;
-     */
-    orderNo: string;
+  /**
+   * Order number;
+   */
+  orderNo: string;
 }
