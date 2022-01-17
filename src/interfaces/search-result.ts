@@ -103,5 +103,3 @@ export interface ParcellabSearchResponse {
   };
   results: ParcellabSearchResult[];
 }
-
-export type ParcellabTrackingDetailsResponse = any;

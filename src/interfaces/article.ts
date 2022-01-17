@@ -4,10 +4,10 @@
  * @see https://how.parcellab.works/docs/integration-quick-start/data-model#article-list
  */
 export interface ParcellabArticle {
-    articleNo: string;
-    articleName: string;
-    articleCategory?: string;
-    articleUrl?: string;
-    articleImageUrl?: string;
-    quantity?: number;
+  articleNo: string;
+  articleName: string;
+  articleCategory?: string;
+  articleUrl?: string;
+  articleImageUrl?: string;
+  quantity?: number;
 }

@@ -12,5 +12,6 @@ export * from './payload-error';
 export * from './search-result';
 export * from './special-keys';
 export * from './tracking-base';
+export * from './tracking-details-response';
 export * from './tracking-number-by-curriers';
 export * from './tracking';

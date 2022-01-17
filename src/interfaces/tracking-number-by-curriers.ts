@@ -1,3 +1,3 @@
 export interface ParcellabTrackingNumberByCurriers {
-    [curier: string]: string| string[];
+  [curier: string]: string | string[];
 }

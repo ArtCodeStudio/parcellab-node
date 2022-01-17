@@ -4,4 +4,9 @@ import { ParcellabNotifications } from './notifications';
 import { ParcellabSpecialKeys } from './special-keys';
 import { ParcellabOptionalKeys } from './optional-keys';
 
-export interface ParcellabOrder extends ParcellabOrderBase, Partial<ParcellabMultishop>, Partial<ParcellabNotifications>, Partial<ParcellabSpecialKeys>, Partial<ParcellabOptionalKeys> {}
+export interface ParcellabOrder
+  extends ParcellabOrderBase,
+    Partial<ParcellabMultishop>,
+    Partial<ParcellabNotifications>,
+    Partial<ParcellabSpecialKeys>,
+    Partial<ParcellabOptionalKeys> {}

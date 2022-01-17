@@ -208,14 +208,14 @@ export class ParcelLabApi {
   public async getTracking(payload: {
     tracking_number: string | string[] | ParcellabTrackingNumberByCurriers;
     courier?: string;
-  }): Promise<ParcellabTrackingDetailsResponse> {
+  }): Promise<ParcellabTrackingDetailsResponse[]> {
     const url = params.endpoint + 'v2/tracking-details/';
 
     const payloads = this.multiplyOnTrackingNumber(
       payload,
     ) as Partial<ParcellabTracking>[];
 
-    const results: ParcellabTrackingDetailsResponse = [];
+    const results: ParcellabTrackingDetailsResponse[] = [];
     for await (const payload of payloads) {
       if (!payload.courier || !payload.tracking_number) {
         this.log.warn('courier and tracking_number are required!');
@@ -225,13 +225,13 @@ export class ParcelLabApi {
         courier: payload.courier,
         tno: payload.tracking_number,
       });
-      const result = (await this.get(
+      const result = await (this.get(
         url,
         query,
         this.user,
         this.token,
         'json',
-      )) as Promise<ParcellabTrackingDetailsResponse>;
+      ) as Promise<ParcellabTrackingDetailsResponse>);
       results.push(result);
     }
     return results;
