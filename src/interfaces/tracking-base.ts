@@ -7,7 +7,7 @@ import { ParcellabTrackingNumberByCurriers } from './tracking-number-by-curriers
  * @see https://how.parcellab.works/docs/integration-quick-start/data-model#required-keys
  */
 export interface ParcellabTrackingBase {
-  articles: ParcellabArticle[];
+  articles?: ParcellabArticle[];
   /**
    * Custom fields can be used to add additional content to the notifications that doesn't fit in any other field.
    * @see https://how.parcellab.works/docs/integration-quick-start/data-model#custom-fields
