@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "engines": {
     "node": ">= 12.0.0"
-},
+  },
   "scripts": {
     "test": "mocha",
     "build": "yarn run clear && tsc",

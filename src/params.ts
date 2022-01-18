@@ -47,6 +47,7 @@ const params = {
     'upgrad',
     'warehouse',
     'weight',
+    'xid',
     'zip_code',
   ],
   datachecks: {

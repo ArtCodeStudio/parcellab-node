@@ -11,4 +11,8 @@ export interface ParcellabOrderBase extends Partial<ParcellabTrackingBase> {
    * Order number;
    */
   orderNo: string;
+  /**
+   * id of delivery before tracking number
+   */
+  xid?: string;
 }
